@@ -1,0 +1,2677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>诗境学堂</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Ma+Shan+Zheng&display=swap');
+
+/* ═══ RESET & BASE ═══ */
+:root{
+  --ink:#1a1008; --ink2:#3d2b1f; --ink3:#6b4c30;
+  --paper:#f7f2e8; --paper2:#ede5d0; --paper3:#e2d8c4;
+  --seal:#c0392b; --gold:#b8912a; --green:#2e7d52; --blue:#1565c0;
+  --sh:rgba(26,16,8,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--paper);color:var(--ink);
+  font-family:'Noto Serif SC',serif;}
+
+/* ═══ APP SHELL ═══ */
+#app{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+#pages{flex:1;position:relative;overflow:hidden;}
+.pg{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:none;flex-direction:column;}
+.pg.on{display:flex;}
+.pg-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* ═══ BOTTOM NAV ═══ */
+#nav{display:flex;background:#1a1008;border-top:1px solid rgba(255,255,255,0.07);
+  flex-shrink:0;z-index:50;}
+.nv{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 4px 6px;color:rgba(245,240,232,0.4);font-size:0.52rem;letter-spacing:0.12em;
+  cursor:pointer;border:none;background:none;font-family:'Noto Serif SC',serif;
+  transition:color 0.2s;gap:2px;}
+.nv .ni{font-size:1.22rem;line-height:1;}
+.nv.on{color:var(--gold);}
+
+/* ═══ SUB TABS ═══ */
+.stabs{display:flex;background:rgba(26,16,8,0.04);
+  border-bottom:1px solid rgba(26,16,8,0.1);flex-shrink:0;}
+.stab{flex:1;padding:10px 4px;font-size:0.62rem;letter-spacing:0.18em;
+  color:var(--ink2);text-align:center;cursor:pointer;border:none;background:none;
+  font-family:'Noto Serif SC',serif;border-bottom:2px solid transparent;
+  margin-bottom:-1px;transition:all 0.2s;}
+.stab.on{color:var(--seal);border-bottom-color:var(--seal);font-weight:600;}
+.spg{display:none;flex:1;overflow-y:auto;}
+.spg.on{display:flex;flex-direction:column;}
+
+/* ═══ COMMON ═══ */
+.inner{max-width:720px;margin:0 auto;padding:14px 15px 28px;}
+.sec{display:flex;align-items:center;gap:9px;margin:16px 0 10px;}
+.sec::before,.sec::after{content:'';flex:1;height:1px;
+  background:linear-gradient(to right,transparent,rgba(184,145,42,0.35),transparent);}
+.sec span{font-size:0.58rem;letter-spacing:0.42em;color:var(--gold);
+  white-space:nowrap;font-weight:600;}
+.card{background:rgba(255,255,255,0.5);border:1px solid rgba(26,16,8,0.09);
+  padding:14px 16px;margin-bottom:11px;box-shadow:2px 2px 0 var(--sh);}
+.xubi-row{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.45);
+  padding:8px 13px;border:1px solid rgba(26,16,8,0.09);margin-bottom:12px;}
+.xubi-val{font-size:0.95rem;font-weight:700;color:var(--gold);
+  margin-left:auto;letter-spacing:0.1em;}
+
+/* ═══ HOME PAGE ═══ */
+.h-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.h-bg-circle{position:absolute;border-radius:50%;opacity:0.07;}
+.h-header{background:linear-gradient(160deg,#1a1008 0%,#2c1a0a 50%,#0e1a06 100%);
+  padding:36px 20px 22px;text-align:center;position:relative;overflow:hidden;flex-shrink:0;}
+.h-logo{font-family:'Ma Shan Zheng',cursive;font-size:2.8rem;color:#f7f2e8;
+  letter-spacing:0.22em;position:relative;display:inline-block;z-index:1;}
+.h-logo em{color:var(--seal);font-style:normal;}
+.h-sub{display:block;font-size:0.55rem;color:rgba(245,240,232,0.42);
+  letter-spacing:0.5em;margin-top:7px;position:relative;z-index:1;}
+.h-seal{display:inline-block;background:rgba(192,57,43,0.75);color:#f7f2e8;
+  font-family:'Ma Shan Zheng',cursive;font-size:0.52rem;padding:2px 10px;
+  letter-spacing:0.22em;margin-top:9px;position:relative;z-index:1;}
+.h-stats{display:flex;margin-top:16px;position:relative;z-index:1;
+  background:rgba(0,0,0,0.18);border-top:1px solid rgba(255,255,255,0.06);}
+.h-stat{flex:1;text-align:center;padding:10px 4px;
+  border-right:1px solid rgba(255,255,255,0.07);}
+.h-stat:last-child{border-right:none;}
+.h-stat-v{display:block;font-size:1.1rem;font-weight:700;color:var(--gold);}
+.h-stat-l{display:block;font-size:0.46rem;color:rgba(245,240,232,0.38);
+  letter-spacing:0.18em;margin-top:1px;}
+
+/* daily strip */
+.h-strip{margin:14px 14px 0;background:rgba(255,255,255,0.5);
+  border:1px solid rgba(26,16,8,0.09);border-left:3px solid var(--seal);
+  padding:11px 14px 11px 14px;cursor:pointer;transition:all 0.2s;
+  position:relative;display:flex;flex-direction:column;gap:3px;}
+.h-strip:active{background:rgba(255,255,255,0.75);}
+.h-strip-top{display:flex;justify-content:space-between;align-items:center;}
+.h-strip-tag{font-size:0.52rem;letter-spacing:0.26em;color:var(--seal);font-weight:600;}
+.h-strip-streak{font-size:0.52rem;color:var(--gold);letter-spacing:0.14em;}
+.h-strip-poem{font-family:'Ma Shan Zheng',cursive;font-size:0.96rem;
+  letter-spacing:0.18em;color:var(--ink);}
+.h-strip-meta{font-size:0.5rem;color:var(--ink2);letter-spacing:0.1em;}
+.h-strip-arr{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-size:1.1rem;color:rgba(26,16,8,0.18);}
+
+/* 5-card grid */
+.h-sec-label{font-size:0.54rem;letter-spacing:0.42em;color:var(--gold);font-weight:600;
+  padding:12px 14px 6px;display:flex;align-items:center;gap:8px;}
+.h-sec-label::before,.h-sec-label::after{content:'';flex:1;height:1px;
+  background:linear-gradient(to right,transparent,rgba(184,145,42,0.28),transparent);}
+.h-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0;
+  padding:0 14px 16px;gap:8px;}
+.h-card{background:rgba(255,255,255,0.52);border:1px solid rgba(26,16,8,0.09);
+  padding:14px 6px 12px;cursor:pointer;transition:all 0.18s;
+  position:relative;overflow:hidden;text-align:center;
+  box-shadow:1px 2px 0 rgba(26,16,8,0.04);}
+.h-card:active{transform:scale(0.95);}
+.h-card-bar{position:absolute;top:0;left:0;right:0;height:3px;}
+.h-card-icon{font-size:1.6rem;display:block;margin-bottom:5px;line-height:1;}
+.h-card-title{font-family:'Ma Shan Zheng',cursive;font-size:1.05rem;
+  letter-spacing:0.2em;color:var(--ink);display:block;margin-bottom:3px;}
+.h-card-desc{font-size:0.48rem;color:var(--ink2);letter-spacing:0.08em;
+  line-height:1.6;display:block;}
+
+/* ═══ LIB (诗库) ═══ */
+.lib-header{background:#1a1008;padding:28px 16px 18px;text-align:center;}
+.lib-title{font-family:'Ma Shan Zheng',cursive;font-size:2.4rem;color:#f7f2e8;
+  letter-spacing:0.2em;position:relative;display:inline-block;}
+.lib-title em{color:var(--seal);font-style:normal;}
+.lib-sub{display:block;font-size:0.56rem;color:rgba(245,240,232,0.45);
+  letter-spacing:0.45em;margin-top:6px;}
+.lib-seal{display:inline-block;background:var(--seal);color:#f7f2e8;
+  font-family:'Ma Shan Zheng',cursive;font-size:0.55rem;padding:2px 10px;
+  letter-spacing:0.2em;margin-top:8px;}
+.py-bar{text-align:center;padding:10px 0 2px;}
+.py-btn{background:none;border:1px solid rgba(26,16,8,0.22);color:var(--ink2);
+  font-family:'Noto Serif SC',serif;font-size:0.62rem;letter-spacing:0.28em;
+  padding:5px 18px;cursor:pointer;transition:all 0.2s;}
+.py-btn.on{background:var(--ink);color:var(--paper);}
+
+/* daily card in lib */
+.dc{background:linear-gradient(135deg,rgba(255,255,255,0.52),rgba(245,240,232,0.3));
+  border:1px solid rgba(26,16,8,0.1);border-left:3px solid var(--seal);
+  padding:18px 20px;position:relative;box-shadow:4px 4px 0 var(--sh);
+  cursor:pointer;transition:all 0.2s;}
+.dc:active{transform:scale(0.99);}
+.dc-badge{position:absolute;top:-10px;left:18px;background:var(--seal);
+  color:#f7f2e8;font-size:0.52rem;padding:2px 10px;letter-spacing:0.25em;}
+.dc-top{display:flex;justify-content:space-between;align-items:flex-start;
+  margin-bottom:10px;}
+.dc-title{font-family:'Ma Shan Zheng',cursive;font-size:1.25rem;letter-spacing:0.2em;}
+.dc-wtag{font-size:0.62rem;color:var(--gold);}
+.dc-body{font-size:0.92rem;line-height:2;letter-spacing:0.15em;font-weight:300;
+  margin-bottom:10px;}
+.dc-meta{display:flex;gap:9px;align-items:center;padding-top:9px;
+  border-top:1px solid rgba(26,16,8,0.1);font-size:0.6rem;color:var(--ink2);}
+.dc-dyn{background:rgba(26,16,8,0.07);padding:2px 8px;font-size:0.55rem;}
+.dc-mood{color:var(--gold);}
+
+/* filter */
+.ftabs{display:flex;overflow-x:auto;border-bottom:1px solid rgba(26,16,8,0.12);
+  scrollbar-width:none;}
+.ftabs::-webkit-scrollbar{display:none;}
+.ftab{padding:8px 14px;font-size:0.6rem;letter-spacing:0.28em;color:var(--ink2);
+  cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;
+  transition:all 0.2s;font-family:'Noto Serif SC',serif;background:none;
+  border-top:none;border-left:none;border-right:none;white-space:nowrap;}
+.ftab.on{color:var(--seal);border-bottom-color:var(--seal);font-weight:600;}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:7px 0 9px;
+  scrollbar-width:none;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{padding:3px 11px;border:1px solid rgba(26,16,8,0.18);font-size:0.6rem;
+  letter-spacing:0.18em;cursor:pointer;color:var(--ink2);background:transparent;
+  font-family:'Noto Serif SC',serif;white-space:nowrap;flex-shrink:0;}
+.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+/* poem grid */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;}
+.pc{background:rgba(255,255,255,0.46);border:1px solid rgba(26,16,8,0.09);
+  cursor:pointer;transition:all 0.22s;overflow:hidden;}
+.pc:active{transform:scale(0.97);}
+.pc-body{padding:10px 11px 10px;}
+.pc-season{font-size:0.5rem;letter-spacing:0.35em;color:var(--gold);margin-bottom:4px;}
+.pc-title{font-family:'Ma Shan Zheng',cursive;font-size:0.98rem;
+  letter-spacing:0.18em;margin-bottom:5px;}
+.pc-excerpt{font-size:0.6rem;line-height:1.7;color:var(--ink2);
+  letter-spacing:0.07em;font-weight:300;}
+.pc-foot{display:flex;justify-content:space-between;margin-top:7px;
+  padding-top:7px;border-top:1px dashed rgba(26,16,8,0.11);font-size:0.55rem;}
+.pc-author{color:var(--ink2);}
+.pc-mood{color:var(--gold);}
+.empty{text-align:center;padding:36px;color:var(--ink2);
+  font-size:0.7rem;letter-spacing:0.28em;grid-column:1/-1;}
+
+/* poem line (with pinyin) */
+.pl{display:block;margin-bottom:4px;}
+.py{font-size:0.58rem;color:var(--gold);letter-spacing:0.07em;line-height:1.4;}
+.lt{display:block;}
+
+/* ═══ MODAL ═══ */
+.ov{display:none;position:fixed;inset:0;background:rgba(26,16,8,0.65);
+  z-index:200;align-items:flex-end;justify-content:center;padding:0;}
+.ov.on{display:flex;}
+.modal{background:var(--paper);width:100%;max-width:720px;max-height:90vh;
+  overflow-y:auto;position:relative;border-top:3px solid var(--seal);
+  animation:slideUp 0.28s ease;}
+@keyframes slideUp{from{transform:translateY(50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-in{padding:18px 20px 30px;}
+.modal-x{position:absolute;top:12px;right:12px;
+  background:rgba(26,16,8,0.6);border:none;color:#f7f2e8;
+  font-size:0.72rem;padding:3px 9px;cursor:pointer;z-index:2;
+  font-family:'Noto Serif SC',serif;letter-spacing:0.1em;}
+.modal-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.mtag{font-size:0.52rem;letter-spacing:0.2em;padding:2px 8px;
+  border:1px solid rgba(26,16,8,0.14);color:var(--ink2);}
+.mtag-r{border-color:var(--seal);color:var(--seal);}
+.modal-title{font-family:'Ma Shan Zheng',cursive;font-size:1.55rem;
+  letter-spacing:0.28em;margin-bottom:3px;}
+.modal-poet{font-size:0.68rem;letter-spacing:0.22em;color:var(--ink2);
+  margin-bottom:16px;}
+.modal-body{font-size:0.92rem;line-height:2.2;letter-spacing:0.18em;
+  font-weight:300;margin-bottom:18px;padding:14px 18px;
+  background:rgba(245,240,232,0.6);border-left:2px solid rgba(26,16,8,0.12);}
+.modal-nl{font-size:0.58rem;letter-spacing:0.38em;color:var(--gold);
+  margin-bottom:6px;font-weight:600;}
+.modal-notes{font-size:0.72rem;line-height:1.92;color:var(--ink2);
+  letter-spacing:0.06em;font-weight:300;margin-bottom:18px;}
+.modal-acts{display:flex;gap:8px;}
+.mact{flex:1;padding:10px;border:none;cursor:pointer;
+  font-family:'Noto Serif SC',serif;font-size:0.6rem;letter-spacing:0.2em;}
+
+/* ═══ DAILY PAGE ═══ */
+.dp-header{background:#1a1008;padding:16px 15px 13px;
+  display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.dp-left .dp-date{font-size:0.58rem;letter-spacing:0.28em;
+  color:rgba(245,240,232,0.52);}
+.dp-left .dp-streak{font-size:0.66rem;color:var(--gold);
+  letter-spacing:0.18em;margin-top:3px;}
+.dp-dots{display:flex;gap:4px;margin-top:4px;}
+.sdot{width:7px;height:7px;border-radius:50%;
+  background:rgba(245,240,232,0.18);}
+.sdot.done{background:var(--gold);}
+.dp-right .dp-rl{font-size:0.5rem;color:rgba(245,240,232,0.42);
+  letter-spacing:0.18em;text-align:right;}
+.dp-right .dp-rv{font-size:1.05rem;color:var(--gold);font-weight:700;
+  text-align:right;}
+
+/* ═══ QUIZ ═══ */
+.qm-btns{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:11px;}
+.qm{padding:7px 13px;border:none;cursor:pointer;
+  font-family:'Noto Serif SC',serif;font-size:0.6rem;
+  letter-spacing:0.2em;transition:all 0.18s;}
+.qprog{background:#1a1008;padding:10px 14px;
+  display:flex;align-items:center;gap:9px;margin-bottom:12px;display:none;}
+.qp-c{font-size:0.6rem;color:rgba(245,240,232,0.58);
+  letter-spacing:0.18em;white-space:nowrap;}
+.qp-bg{flex:1;background:rgba(255,255,255,0.12);height:4px;}
+.qp-fill{height:100%;background:var(--gold);transition:width 0.35s ease;}
+.qp-s{font-size:0.62rem;color:var(--gold);font-weight:700;
+  letter-spacing:0.12em;white-space:nowrap;}
+/* question */
+.qtype{font-size:0.52rem;letter-spacing:0.22em;padding:2px 9px;
+  border:1px solid;margin-bottom:9px;display:inline-block;}
+.qt-fill{border-color:var(--green);color:var(--green);}
+.qt-next{border-color:var(--blue);color:var(--blue);}
+.qt-auth{border-color:var(--gold);color:var(--gold);}
+.q-hint{font-size:0.6rem;color:var(--ink2);letter-spacing:0.14em;margin-bottom:9px;}
+.q-ques{font-family:'Ma Shan Zheng',cursive;font-size:1.42rem;
+  letter-spacing:0.28em;color:var(--ink);margin-bottom:5px;line-height:1.55;}
+.q-exc{font-size:0.72rem;color:var(--ink2);letter-spacing:0.1em;
+  margin-bottom:14px;font-weight:300;line-height:1.75;}
+.q-opts{display:grid;gap:6px;}
+.qopt{padding:10px 13px;border:1px solid rgba(26,16,8,0.16);
+  background:rgba(255,255,255,0.5);cursor:pointer;text-align:center;
+  font-size:0.82rem;letter-spacing:0.14em;transition:all 0.16s;
+  font-family:'Noto Serif SC',serif;}
+.qopt.cor{background:rgba(46,125,82,0.12);border-color:var(--green);
+  color:var(--green);}
+.qopt.wrg{background:rgba(192,57,43,0.08);border-color:var(--seal);
+  color:var(--seal);}
+.qopt.dis{cursor:default;pointer-events:none;}
+.q-fill-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.qchar{padding:12px 4px;border:1px solid rgba(26,16,8,0.16);
+  background:rgba(255,255,255,0.5);cursor:pointer;text-align:center;
+  font-size:1.2rem;font-family:'Ma Shan Zheng',cursive;transition:all 0.14s;}
+.qchar.cor{background:rgba(46,125,82,0.14);border-color:var(--green);}
+.qchar.wrg{background:rgba(192,57,43,0.1);border-color:var(--seal);}
+.qres{display:none;text-align:center;padding:12px;margin-top:8px;}
+.qres.on{display:block;animation:pop 0.28s ease;}
+@keyframes pop{from{opacity:0;transform:scale(0.84)}to{opacity:1;transform:scale(1)}}
+.qri{font-size:2rem;display:block;margin-bottom:3px;}
+.qrm{font-size:0.68rem;letter-spacing:0.16em;color:var(--ink2);margin-bottom:5px;}
+.qrx{font-size:0.88rem;color:var(--gold);font-weight:700;letter-spacing:0.18em;}
+.qrl{font-family:'Ma Shan Zheng',cursive;font-size:0.95rem;
+  color:var(--ink);margin-top:5px;letter-spacing:0.2em;}
+.q-next{display:none;width:100%;padding:10px;background:var(--ink);
+  color:var(--paper);font-size:0.62rem;letter-spacing:0.28em;border:none;
+  cursor:pointer;margin-top:9px;font-family:'Noto Serif SC',serif;}
+.q-next.on{display:block;}
+
+/* settlement */
+.settle{text-align:center;padding:6px 0 14px;}
+.settle-ring{width:115px;height:115px;margin:0 auto 14px;position:relative;}
+.settle-ring svg{width:100%;height:100%;}
+.settle-ring-txt{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;}
+.settle-pct{font-family:'Ma Shan Zheng',cursive;font-size:1.9rem;
+  color:var(--ink);line-height:1;}
+.settle-pct-l{font-size:0.5rem;color:var(--ink2);letter-spacing:0.18em;margin-top:2px;}
+.settle-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0;}
+.ss{background:rgba(255,255,255,0.46);border:1px solid rgba(26,16,8,0.09);
+  padding:9px 5px;text-align:center;}
+.ss-v{font-size:1.05rem;font-weight:700;}
+.ss-l{font-size:0.5rem;color:var(--ink2);letter-spacing:0.14em;margin-top:1px;}
+.settle-xubi{font-size:0.92rem;color:var(--gold);font-weight:700;
+  letter-spacing:0.18em;margin:8px 0 12px;}
+.settle-btns{display:flex;gap:7px;}
+.sbtn{flex:1;padding:10px;border:none;cursor:pointer;
+  font-family:'Noto Serif SC',serif;font-size:0.6rem;letter-spacing:0.22em;}
+
+/* ═══ WRONG BOOK ═══ */
+.wb-item{background:rgba(255,255,255,0.46);border:1px solid rgba(26,16,8,0.09);
+  border-left:3px solid var(--seal);padding:12px 14px;margin-bottom:9px;}
+.wb-poem{font-size:0.56rem;color:var(--ink2);letter-spacing:0.18em;margin-bottom:5px;}
+.wb-ques{font-family:'Ma Shan Zheng',cursive;font-size:1.05rem;
+  letter-spacing:0.2em;margin-bottom:5px;}
+.wb-ans{font-size:0.64rem;color:var(--green);letter-spacing:0.14em;}
+.wb-line{font-size:0.6rem;color:var(--ink2);margin-top:3px;letter-spacing:0.1em;}
+.wb-cnt{font-size:0.5rem;color:var(--seal);letter-spacing:0.14em;float:right;}
+.wb-acts{display:flex;gap:6px;margin-top:9px;}
+.wba{padding:4px 11px;border:none;cursor:pointer;
+  font-family:'Noto Serif SC',serif;font-size:0.55rem;letter-spacing:0.16em;}
+
+/* ═══ RECITE ═══ */
+.rec-poem{background:rgba(255,255,255,0.46);border-left:3px solid var(--seal);
+  padding:14px 16px;margin-bottom:10px;}
+.rec-title{font-family:'Ma Shan Zheng',cursive;font-size:1.05rem;
+  letter-spacing:0.2em;margin-bottom:7px;}
+.rec-lines{font-size:0.88rem;line-height:2.1;letter-spacing:0.13em;
+  font-weight:300;white-space:pre-line;}
+.rec-btn{width:100%;padding:10px;margin-top:9px;font-size:0.62rem;
+  letter-spacing:0.26em;cursor:pointer;font-family:'Noto Serif SC',serif;border:none;}
+.rec-start{background:var(--seal);color:#f7f2e8;}
+.rec-stop{background:#777;color:#f7f2e8;}
+.rec-scores{display:none;margin-top:11px;}
+.rec-scores.on{display:block;animation:pop 0.35s ease;}
+.rec-big{text-align:center;margin:5px 0 9px;}
+.rec-num{font-family:'Ma Shan Zheng',cursive;font-size:2.1rem;color:var(--ink);}
+.rec-numl{font-size:0.56rem;color:var(--ink2);letter-spacing:0.2em;}
+.srow{display:flex;align-items:center;gap:5px;margin-bottom:4px;
+  font-size:0.6rem;color:var(--ink2);}
+.srow-l{width:42px;flex-shrink:0;}
+.sbg{flex:1;background:var(--paper2);height:4px;}
+.sfill{height:100%;background:var(--gold);transition:width 0.7s ease;}
+.snv{width:22px;text-align:right;}
+.rec-xubi{margin-top:7px;font-size:0.62rem;color:var(--gold);
+  letter-spacing:0.18em;text-align:center;}
+
+/* ═══ RANK ═══ */
+.lb-hd{display:grid;grid-template-columns:34px 1fr 54px 52px;gap:5px;
+  padding:6px 9px;font-size:0.52rem;letter-spacing:0.16em;color:var(--ink2);
+  border-bottom:1px solid rgba(26,16,8,0.1);}
+.lb-row{display:grid;grid-template-columns:34px 1fr 54px 52px;gap:5px;
+  padding:9px 9px;align-items:center;
+  border-bottom:1px dashed rgba(26,16,8,0.07);}
+.lb-row.me{background:rgba(192,57,43,0.05);}
+.lb-rk{font-size:0.68rem;font-weight:700;color:var(--ink2);text-align:center;}
+.lb-rk.g{color:#c0962a;font-size:0.86rem;}
+.lb-rk.s{color:#7f8c8d;font-size:0.8rem;}
+.lb-rk.b{color:#935116;font-size:0.76rem;}
+.lb-nm{font-size:0.7rem;letter-spacing:0.08em;display:flex;align-items:center;gap:5px;}
+.lb-av{width:20px;height:20px;background:var(--paper2);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.62rem;flex-shrink:0;}
+.lb-sc{font-size:0.68rem;color:var(--gold);font-weight:600;text-align:right;}
+.lb-bd{font-size:0.48rem;padding:1px 5px;color:#f7f2e8;text-align:center;}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.sgc{background:rgba(255,255,255,0.46);border:1px solid rgba(26,16,8,0.09);
+  padding:12px;text-align:center;}
+.sgc-i{font-size:1.3rem;display:block;margin-bottom:3px;}
+.sgc-v{font-size:1.05rem;font-weight:700;}
+.sgc-l{font-size:0.5rem;color:var(--ink2);letter-spacing:0.16em;margin-top:1px;}
+
+/* ═══ BIRD ═══ */
+.bird-wrap{text-align:center;padding:14px 0 7px;}
+.bird-svg{width:105px;height:105px;margin:0 auto;display:block;}
+.bird-name{font-family:'Ma Shan Zheng',cursive;font-size:1.15rem;
+  letter-spacing:0.26em;margin-top:4px;}
+.bird-lv{font-size:0.6rem;letter-spacing:0.2em;color:var(--gold);margin-top:1px;}
+.rank-big{display:inline-block;padding:2px 11px;font-size:0.6rem;
+  letter-spacing:0.26em;color:#f7f2e8;margin:5px auto 0;}
+.exp-bg{background:var(--paper2);height:6px;overflow:hidden;}
+.exp-fill{height:100%;background:linear-gradient(to right,var(--gold),#e0c030);
+  transition:width 0.55s ease;}
+.exp-meta{display:flex;justify-content:space-between;font-size:0.5rem;
+  color:var(--ink2);margin-top:2px;}
+.co-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+.co{background:rgba(255,255,255,0.46);border:2px solid transparent;
+  padding:9px 5px;text-align:center;cursor:pointer;transition:all 0.18s;}
+.co.owned{border-color:var(--gold);}
+.co.equipped{border-color:var(--seal);background:rgba(192,57,43,0.05);}
+.co.locked{opacity:0.4;cursor:default;}
+.co-icon{font-size:1.7rem;display:block;margin-bottom:2px;}
+.co-name{font-size:0.55rem;letter-spacing:0.12em;color:var(--ink2);}
+.co-price{font-size:0.5rem;color:var(--gold);margin-top:1px;}
+
+/* ═══ AI CREATE ═══ */
+.ai-hdr{background:linear-gradient(135deg,#1a1008,#2d1f0e);
+  padding:26px 16px 18px;text-align:center;flex-shrink:0;}
+.ai-hdr-t{font-family:'Ma Shan Zheng',cursive;font-size:1.7rem;
+  color:#f7f2e8;letter-spacing:0.28em;display:block;}
+.ai-hdr-s{font-size:0.56rem;color:rgba(245,240,232,0.45);
+  letter-spacing:0.32em;margin-top:5px;display:block;}
+.ai-step-lbl{font-size:0.58rem;letter-spacing:0.33em;color:var(--gold);
+  font-weight:600;margin-bottom:7px;display:flex;align-items:center;gap:7px;}
+.ai-step-lbl::after{content:'';flex:1;height:1px;background:rgba(184,145,42,0.28);}
+.ai-step-num{width:16px;height:16px;background:var(--gold);color:#fff;
+  font-size:0.52rem;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;border-radius:50%;}
+.poet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.poet-btn{padding:9px 5px;border:1px solid rgba(26,16,8,0.16);
+  background:rgba(255,255,255,0.46);cursor:pointer;text-align:center;
+  transition:all 0.18s;font-family:'Noto Serif SC',serif;}
+.poet-btn.on{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.pb-name{display:block;font-family:'Ma Shan Zheng',cursive;
+  font-size:0.96rem;letter-spacing:0.18em;}
+.pb-style{display:block;font-size:0.5rem;opacity:0.6;
+  letter-spacing:0.1em;margin-top:1px;}
+.scene-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;}
+.scene-btn{padding:9px 11px;border:1px solid rgba(26,16,8,0.16);
+  background:rgba(255,255,255,0.46);cursor:pointer;text-align:left;
+  transition:all 0.18s;font-family:'Noto Serif SC',serif;
+  display:flex;align-items:center;gap:7px;}
+.scene-btn.on{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+.sc-icon{font-size:1.15rem;flex-shrink:0;}
+.sc-text{font-size:0.62rem;letter-spacing:0.13em;}
+.tone-row{display:flex;gap:6px;flex-wrap:wrap;}
+.tone-btn{padding:4px 12px;border:1px solid rgba(26,16,8,0.16);
+  background:rgba(255,255,255,0.46);cursor:pointer;font-size:0.58rem;
+  letter-spacing:0.18em;transition:all 0.18s;font-family:'Noto Serif SC',serif;}
+.tone-btn.on{background:var(--seal);color:#f7f2e8;border-color:var(--seal);}
+.ai-gen-btn{width:100%;padding:13px;
+  background:linear-gradient(135deg,var(--seal),#8b1a1a);
+  color:#f7f2e8;border:none;cursor:pointer;
+  font-family:'Noto Serif SC',serif;font-size:0.74rem;letter-spacing:0.38em;
+  margin-top:5px;transition:all 0.28s;position:relative;overflow:hidden;}
+.ai-gen-btn:disabled{opacity:0.52;cursor:not-allowed;}
+.shimmer{position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.14),transparent);
+  transform:translateX(-100%);animation:shimmer 1.7s infinite;}
+@keyframes shimmer{to{transform:translateX(100%);}}
+.ai-loading{text-align:center;padding:28px;display:none;}
+.ai-loading.on{display:block;}
+.ai-bird{font-size:2.4rem;display:block;
+  animation:bob 0.75s ease-in-out infinite alternate;}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(-7px)}}
+.ai-loading-t{font-size:0.66rem;color:var(--ink2);letter-spacing:0.22em;
+  margin-top:9px;display:block;}
+.ai-result{margin-top:14px;display:none;}
+.ai-result.on{display:block;animation:pop 0.42s ease;}
+.ai-poem-card{background:linear-gradient(135deg,rgba(255,255,255,0.55),
+  rgba(245,240,232,0.35));border:1px solid rgba(26,16,8,0.1);
+  border-left:3px solid var(--seal);padding:20px 18px;
+  box-shadow:3px 3px 0 var(--sh);}
+.ai-pt{font-family:'Ma Shan Zheng',cursive;font-size:1.35rem;
+  letter-spacing:0.28em;margin-bottom:3px;}
+.ai-pm{font-size:0.56rem;color:var(--ink2);letter-spacing:0.2em;margin-bottom:15px;}
+.ai-pb{font-size:0.95rem;line-height:2.3;letter-spacing:0.18em;
+  font-weight:300;white-space:pre-wrap;}
+.ai-pn{font-size:0.66rem;color:var(--ink2);letter-spacing:0.1em;
+  line-height:1.82;margin-top:14px;padding-top:12px;
+  border-top:1px dashed rgba(26,16,8,0.11);}
+.ai-acts{display:flex;gap:7px;margin-top:12px;}
+.ai-act{flex:1;padding:9px;border:none;cursor:pointer;
+  font-family:'Noto Serif SC',serif;font-size:0.58rem;letter-spacing:0.2em;}
+.ai-hist-item{background:rgba(255,255,255,0.42);
+  border:1px solid rgba(26,16,8,0.08);padding:11px 13px;
+  margin-bottom:7px;cursor:pointer;transition:background 0.18s;}
+.ai-hist-item:active{background:rgba(255,255,255,0.65);}
+.ai-hist-t{font-family:'Ma Shan Zheng',cursive;font-size:0.96rem;
+  letter-spacing:0.18em;}
+.ai-hist-m{font-size:0.52rem;color:var(--ink2);letter-spacing:0.15em;margin-top:2px;}
+
+/* ═══ TOAST ═══ */
+.toast{position:fixed;top:14px;left:50%;
+  transform:translateX(-50%) translateY(-56px);
+  background:#1a1008;color:#f7f2e8;padding:7px 18px;
+  font-size:0.62rem;letter-spacing:0.2em;z-index:999;
+  transition:transform 0.3s ease;pointer-events:none;}
+.toast.on{transform:translateX(-50%) translateY(0);}
+
+/* ═══ POET CHAT / CALL UI ═══ */
+/* Call trigger button */
+.call-btn-wrap{margin-top:16px;text-align:center;padding:4px 0 2px;}
+.call-btn{display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,#1a5c2a,#2e7d52);
+  color:#f7f2e8;border:none;padding:11px 28px;cursor:pointer;
+  font-family:'Noto Serif SC',serif;font-size:0.72rem;letter-spacing:0.28em;
+  transition:all 0.2s;box-shadow:0 3px 12px rgba(46,125,82,0.35);}
+.call-btn:active{transform:scale(0.96);}
+.call-btn-icon{font-size:1.1rem;animation:callShake 1.8s infinite;}
+@keyframes callShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-15deg)}
+  40%{transform:rotate(15deg)}60%{transform:rotate(-10deg)}80%{transform:rotate(10deg)}}
+
+
+
+/* ═══ POETS GALLERY & CALL ═══ */
+.pg-gallery{padding:0 0 20px;}
+.pg-header{background:linear-gradient(160deg,#0d1008,#1a1a08,#0d1208);
+  padding:32px 18px 22px;text-align:center;position:relative;overflow:hidden;}
+.pg-header::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 100%,rgba(184,145,42,0.12) 0%,transparent 70%);
+  pointer-events:none;}
+.pg-header-title{font-family:'Ma Shan Zheng',cursive;font-size:1.5rem;
+  color:#f7f2e8;letter-spacing:0.3em;position:relative;z-index:1;}
+.pg-header-sub{font-size:0.55rem;color:rgba(245,240,232,0.4);
+  letter-spacing:0.38em;margin-top:6px;display:block;position:relative;z-index:1;}
+
+/* Poet cards grid */
+.poet-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+  padding:16px 14px;}
+.poet-card{background:rgba(255,255,255,0.48);border:1px solid rgba(26,16,8,0.1);
+  overflow:hidden;cursor:pointer;transition:all 0.22s;position:relative;
+  box-shadow:2px 3px 0 rgba(26,16,8,0.06);}
+.poet-card:active{transform:scale(0.96);}
+.poet-card-img{width:100%;height:130px;display:block;object-fit:cover;
+  object-position:top center;filter:sepia(15%) brightness(0.92);}
+.poet-card-img-ph{width:100%;height:130px;display:flex;align-items:center;
+  justify-content:center;font-size:3rem;
+  background:linear-gradient(135deg,#1a1008,#2d1a06);}
+.poet-card-body{padding:10px 12px 10px;}
+.poet-card-name{font-family:'Ma Shan Zheng',cursive;font-size:1.1rem;
+  letter-spacing:0.22em;color:var(--ink);margin-bottom:2px;}
+.poet-card-meta{font-size:0.52rem;color:var(--ink2);letter-spacing:0.15em;}
+.poet-card-style{font-size:0.5rem;color:var(--gold);letter-spacing:0.12em;
+  margin-top:3px;padding:2px 7px;border:1px solid rgba(184,145,42,0.3);
+  display:inline-block;}
+.poet-card-call{position:absolute;bottom:10px;right:10px;
+  background:linear-gradient(135deg,#1a5c2a,#2e7d52);
+  color:#f7f2e8;border:none;padding:5px 10px;font-size:0.55rem;
+  letter-spacing:0.18em;cursor:pointer;
+  animation:callPulse 2s ease infinite;}
+@keyframes callPulse{0%,100%{box-shadow:0 0 0 0 rgba(46,125,82,0.5)}
+  50%{box-shadow:0 0 0 6px rgba(46,125,82,0)}}
+
+/* ── CALL SCREEN (full redesign) ── */
+.call-overlay{position:fixed;inset:0;z-index:500;display:none;
+  flex-direction:column;align-items:center;justify-content:flex-start;}
+.call-overlay.on{display:flex;animation:callFadeIn 0.4s ease;}
+@keyframes callFadeIn{from{opacity:0}to{opacity:1}}
+
+/* Full bg image with heavy overlay */
+.call-bg{position:absolute;inset:0;background-size:cover;
+  background-position:top center;z-index:0;}
+.call-bg-overlay{position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,
+    rgba(5,5,3,0.7) 0%,
+    rgba(8,8,4,0.55) 30%,
+    rgba(5,5,3,0.7) 65%,
+    rgba(5,5,3,0.95) 100%);}
+
+.call-content{position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:center;
+  width:100%;max-width:420px;height:100%;}
+
+/* Status bar */
+.call-status-bar{width:100%;display:flex;justify-content:space-between;
+  align-items:center;padding:14px 20px 0;
+  font-size:0.52rem;color:rgba(245,240,232,0.38);letter-spacing:0.18em;}
+.call-timer{color:var(--gold);font-size:0.62rem;letter-spacing:0.15em;font-weight:600;}
+
+/* Portrait */
+.call-portrait{width:110px;height:110px;border-radius:50%;
+  overflow:hidden;margin-top:28px;
+  border:2px solid rgba(184,145,42,0.5);
+  box-shadow:0 0 0 6px rgba(184,145,42,0.1),0 0 30px rgba(184,145,42,0.2);
+  position:relative;flex-shrink:0;}
+.call-portrait img{width:100%;height:100%;object-fit:cover;object-position:top;}
+.call-portrait-ph{width:100%;height:100%;display:flex;align-items:center;
+  justify-content:center;font-size:3rem;
+  background:linear-gradient(135deg,#1a1008,#2d1a06);}
+.call-ring{position:absolute;border-radius:50%;
+  border:1px solid rgba(184,145,42,0.3);}
+.call-ring.r1{inset:-12px;animation:ringOut 2s ease infinite;}
+.call-ring.r2{inset:-24px;animation:ringOut 2s 0.4s ease infinite;}
+.call-ring.r3{inset:-36px;animation:ringOut 2s 0.8s ease infinite;}
+@keyframes ringOut{0%{opacity:0.8;transform:scale(0.95)}
+  100%{opacity:0;transform:scale(1.3)}}
+
+.call-poet-name{font-family:'Ma Shan Zheng',cursive;font-size:1.55rem;
+  color:#f7f2e8;letter-spacing:0.3em;margin-top:14px;}
+.call-poet-dyn{font-size:0.58rem;color:rgba(245,240,232,0.45);
+  letter-spacing:0.22em;margin-top:4px;}
+.call-state{font-size:0.65rem;color:var(--gold);letter-spacing:0.22em;
+  margin-top:8px;height:18px;transition:opacity 0.3s;}
+
+/* Convo + chips */
+.call-convo{flex:1;width:100%;overflow-y:auto;padding:8px 16px 4px;
+  display:none;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;}
+.call-convo::-webkit-scrollbar{display:none;}
+.call-convo.on{display:block;}
+.call-chips{width:100%;display:none;gap:6px;flex-wrap:wrap;
+  padding:4px 14px;justify-content:center;}
+.call-chips.on{display:flex;}
+.call-chip{padding:5px 10px;border:1px solid rgba(245,240,232,0.18);
+  background:rgba(255,255,255,0.07);font-size:0.56rem;letter-spacing:0.09em;
+  color:rgba(245,240,232,0.78);cursor:pointer;transition:all 0.16s;
+  font-family:'Noto Serif SC',serif;}
+.call-chip:active{background:rgba(255,255,255,0.16);}
+
+.call-msg{margin-bottom:10px;animation:msgSlide 0.22s ease;}
+@keyframes msgSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.call-msg.user{text-align:right;}
+.call-bubble-name{font-size:0.46rem;color:rgba(245,240,232,0.32);
+  letter-spacing:0.14em;margin-bottom:3px;}
+.call-bubble{display:inline-block;padding:8px 12px;font-size:0.7rem;
+  letter-spacing:0.08em;line-height:1.72;max-width:82%;}
+.call-bubble.poet{background:rgba(255,255,255,0.1);
+  backdrop-filter:blur(4px);color:rgba(245,240,232,0.92);
+  border-radius:0 10px 10px 10px;text-align:left;
+  border:1px solid rgba(255,255,255,0.08);}
+.call-bubble.user{background:rgba(184,145,42,0.28);
+  color:rgba(245,240,232,0.95);border-radius:10px 0 10px 10px;
+  text-align:left;border:1px solid rgba(184,145,42,0.2);}
+.call-bubble.typing::after{content:'……';animation:dotsA 1s infinite;}
+@keyframes dotsA{0%,100%{opacity:0.3}50%{opacity:1}}
+
+/* Input bar */
+.call-input-bar{width:100%;padding:8px 14px 10px;
+  background:rgba(0,0,0,0.4);backdrop-filter:blur(8px);
+  border-top:1px solid rgba(255,255,255,0.07);
+  display:none;gap:7px;align-items:flex-end;flex-shrink:0;}
+.call-input-bar.on{display:flex;}
+.call-input{flex:1;background:rgba(255,255,255,0.09);
+  border:1px solid rgba(255,255,255,0.14);color:#f7f2e8;
+  font-family:'Noto Serif SC',serif;font-size:0.7rem;letter-spacing:0.1em;
+  padding:7px 10px;outline:none;resize:none;line-height:1.6;
+  max-height:70px;min-height:32px;}
+.call-input::placeholder{color:rgba(245,240,232,0.25);}
+.call-input-send{padding:7px 12px;background:var(--gold);color:#1a1008;
+  border:none;cursor:pointer;font-size:0.62rem;letter-spacing:0.18em;
+  font-family:'Noto Serif SC',serif;flex-shrink:0;align-self:flex-end;
+  transition:all 0.16s;}
+.call-input-send:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* Controls */
+.call-controls{display:flex;align-items:center;justify-content:center;
+  gap:28px;padding:14px 0 28px;flex-shrink:0;}
+.call-ctrl{width:50px;height:50px;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;font-size:1.2rem;
+  cursor:pointer;border:none;transition:all 0.16s;}
+.call-ctrl:active{transform:scale(0.9);}
+.call-ctrl.mute{background:rgba(255,255,255,0.12);color:#f7f2e8;}
+.call-ctrl.mute.on{background:rgba(192,57,43,0.6);}
+.call-ctrl.end{background:#c0392b;color:#f7f2e8;width:62px;height:62px;
+  font-size:1.4rem;box-shadow:0 4px 20px rgba(192,57,43,0.5);}
+.call-ctrl.spk{background:rgba(255,255,255,0.12);color:#f7f2e8;}
+.call-ctrl.spk.on{background:rgba(184,145,42,0.5);}
+
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="pages">
+
+    <!-- ══ HOME ══ -->
+    <div class="pg on" id="pg-home">
+      <!-- Header -->
+      <div class="h-header">
+        <div class="h-bg">
+          <div class="h-bg-circle" style="width:260px;height:260px;top:-80px;left:-60px;background:var(--gold);"></div>
+          <div class="h-bg-circle" style="width:180px;height:180px;bottom:-40px;right:-30px;background:var(--seal);"></div>
+        </div>
+        <div><span class="h-logo">诗<em>境</em></span></div>
+        <span class="h-sub">古诗词 · 学练评 · AI 对话</span>
+        <div><span class="h-seal">詩境學堂</span></div>
+        <div class="h-stats">
+          <div class="h-stat">
+            <span class="h-stat-v" id="hXubi">0</span>
+            <span class="h-stat-l">趣币</span>
+          </div>
+          <div class="h-stat">
+            <span class="h-stat-v" id="hStreak">0</span>
+            <span class="h-stat-l">连续打卡</span>
+          </div>
+          <div class="h-stat">
+            <span class="h-stat-v" id="hRank">童生</span>
+            <span class="h-stat-l">当前段位</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pg-scroll">
+        <!-- 今日一练 -->
+        <div class="h-strip" id="hDailyStrip">
+          <div class="h-strip-top">
+            <span class="h-strip-tag">📅 今日一练</span>
+            <span class="h-strip-streak" id="hStreakTxt">连续 0 天 🔥</span>
+          </div>
+          <span class="h-strip-poem" id="hDailyPoem">加载中…</span>
+          <span class="h-strip-meta" id="hDailyMeta"></span>
+          <span class="h-strip-arr">›</span>
+        </div>
+
+        <!-- 五大入口 -->
+        <div class="h-sec-label"><span>功能入口</span></div>
+        <div class="h-grid">
+          <div class="h-card" onclick="nav('learn')">
+            <div class="h-card-bar" style="background:linear-gradient(90deg,#2e7d52,#66bb6a)"></div>
+            <span class="h-card-icon">📖</span>
+            <span class="h-card-title">学</span>
+            <span class="h-card-desc">诗库·拼音·赏析·AI对话</span>
+          </div>
+          <div class="h-card" onclick="nav('test')">
+            <div class="h-card-bar" style="background:linear-gradient(90deg,#1565c0,#42a5f5)"></div>
+            <span class="h-card-icon">✍️</span>
+            <span class="h-card-title">练</span>
+            <span class="h-card-desc">每日一练·专项练习·错题本</span>
+          </div>
+          <div class="h-card" onclick="navSub('learn','learn-poets')">
+            <div class="h-card-bar" style="background:linear-gradient(90deg,#c0392b,#ef5350)"></div>
+            <span class="h-card-icon">🎤</span>
+            <span class="h-card-title">评</span>
+            <span class="h-card-desc">跟读测评·发音打分</span>
+          </div>
+          <div class="h-card" onclick="nav('ai')">
+            <div class="h-card-bar" style="background:linear-gradient(90deg,#6a1b9a,#ab47bc)"></div>
+            <span class="h-card-icon">✨</span>
+            <span class="h-card-title">AI</span>
+            <span class="h-card-desc">选诗人·选场景·AI赋诗</span>
+          </div>
+          <div class="h-card" onclick="nav('me')">
+            <div class="h-card-bar" style="background:linear-gradient(90deg,#388e3c,#66bb6a)"></div>
+            <span class="h-card-icon">🐦</span>
+            <span class="h-card-title">我</span>
+            <span class="h-card-desc">小趣养成·段位·排行</span>
+          </div>
+        </div>
+        <div style="height:12px"></div>
+      </div>
+    </div>
+
+    <!-- ══ LEARN ══ -->
+    <div class="pg" id="pg-learn">
+      <div class="stabs">
+        <button class="stab on" data-sub="learn-lib">📖 诗库</button>
+        <button class="stab" data-sub="learn-poets">🧑‍🎨 与诗人</button>
+      </div>
+      <div class="spg on" id="spg-learn-lib">
+        <div class="lib-header">
+          <div><span class="lib-title">诗<em>境</em></span></div>
+          <span class="lib-sub">古诗词 · 四时八节 · 千古情怀</span>
+          <div><span class="lib-seal">詩境</span></div>
+        </div>
+        <div class="inner">
+          <div class="py-bar"><button class="py-btn" id="pyBtn">显示拼音</button></div>
+          <div class="sec"><span>每日一诗</span></div>
+          <div class="dc" id="libDailyCard">
+            <div class="dc-badge">今日推荐</div>
+            <div class="dc-top">
+              <div class="dc-title" id="libDailyTitle"></div>
+              <div class="dc-wtag" id="libDailyWtag"></div>
+            </div>
+            <div class="dc-body" id="libDailyBody"></div>
+            <div class="dc-meta">
+              <span class="dc-dyn" id="libDailyDyn"></span>
+              <span id="libDailyAuth"></span>
+              <span class="dc-mood" id="libDailyMood"></span>
+            </div>
+          </div>
+          <div class="sec"><span>诗词浏览</span></div>
+          <div class="ftabs" id="ftabs">
+            <button class="ftab on" data-tab="season">季节</button>
+            <button class="ftab" data-tab="weather">天气</button>
+            <button class="ftab" data-tab="mood">心情</button>
+            <button class="ftab" data-tab="theme">题材</button>
+            <button class="ftab" data-tab="form">诗体</button>
+            <button class="ftab" data-tab="lifestage">人生阶段</button>
+          </div>
+          <div class="chips" id="chips"></div>
+          <div class="pgrid" id="pgrid"></div>
+        </div>
+      </div>
+      <div class="spg" id="spg-learn-poets">
+        <div id="poetsGallery"></div>
+      </div>
+    </div>
+
+    <!-- ══ PRACTICE (练) ══ -->
+    <div class="pg" id="pg-test">
+      <div class="stabs">
+        <button class="stab on" data-sub="test-daily">📅 每日一练</button>
+        <button class="stab" data-sub="test-quiz">✍️ 专项练习</button>
+        <button class="stab" data-sub="test-wrong">📕 错题本</button>
+      </div>
+
+      <!-- Sub: 每日一练 (moved from pg-daily) -->
+      <div class="spg on" id="spg-test-daily">
+        <div class="dp-header">
+          <div class="dp-left">
+            <div class="dp-date" id="dpDate"></div>
+            <div class="dp-streak" id="dpStreak"></div>
+            <div class="dp-dots" id="dpDots"></div>
+          </div>
+          <div class="dp-right">
+            <div class="dp-rl">今日趣币</div>
+            <div class="dp-rv" id="dpXubi">+0</div>
+          </div>
+        </div>
+        <div class="pg-scroll"><div class="inner" id="dpArea"></div></div>
+      </div>
+      <div class="spg on" id="spg-test-quiz">
+        <div class="inner">
+          <div class="xubi-row">
+            <span>🪙</span>
+            <span style="font-size:0.62rem;letter-spacing:0.18em;color:var(--ink2)">趣币余额</span>
+            <span class="xubi-val" id="quizXubi">0</span>
+          </div>
+          <div class="qm-btns">
+            <button class="qm" style="background:var(--green);color:#fff" onclick="startQuiz('fill')">填空题</button>
+            <button class="qm" style="background:var(--blue);color:#fff" onclick="startQuiz('next')">接下句</button>
+            <button class="qm" style="background:var(--gold);color:#fff" onclick="startQuiz('author')">猜作者</button>
+            <button class="qm" style="background:var(--paper2);color:var(--ink2)" onclick="startQuiz('all')">随机混合</button>
+          </div>
+          <div id="qprog" class="qprog">
+            <span class="qp-c" id="qpC">0/20</span>
+            <div class="qp-bg"><div class="qp-fill" id="qpFill" style="width:0%"></div></div>
+            <span class="qp-s" id="qpS">✓0 ✗0</span>
+          </div>
+          <div id="quizArea"></div>
+        </div>
+      </div>
+      <div class="spg" id="spg-test-wrong">
+        <div class="inner">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;margin-top:4px">
+            <span style="font-size:0.62rem;color:var(--ink2);letter-spacing:0.16em" id="wbCount">共 0 道错题</span>
+            <button class="wba" style="background:var(--seal);color:#f7f2e8" onclick="startWBQuiz()">重新练习</button>
+          </div>
+          <div id="wbList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ POETS ══ -->
+    <div class="pg" id="pg-poets">
+      <div id="poetsGalleryPage"></div>
+    </div>
+
+    <!-- ══ AI ══ -->
+    <div class="pg" id="pg-ai">
+      <div class="ai-hdr">
+        <span class="ai-hdr-t">✨ AI 创诗</span>
+        <span class="ai-hdr-s">选择诗人与场景，让 AI 以古人口吻为你赋诗</span>
+      </div>
+      <div class="pg-scroll"><div class="inner">
+        <div style="margin-bottom:13px">
+          <div class="ai-step-lbl"><span class="ai-step-num">1</span>选择诗人</div>
+          <div class="poet-grid" id="poetGrid"></div>
+        </div>
+        <div style="margin-bottom:13px">
+          <div class="ai-step-lbl"><span class="ai-step-num">2</span>选择场景</div>
+          <div class="scene-grid" id="sceneGrid"></div>
+        </div>
+        <div style="margin-bottom:13px">
+          <div class="ai-step-lbl"><span class="ai-step-num">3</span>选择基调</div>
+          <div class="tone-row" id="toneRow"></div>
+        </div>
+        <div style="margin-bottom:13px">
+          <div class="ai-step-lbl"><span class="ai-step-num">4</span>补充想法（选填）</div>
+          <textarea id="aiExtra" placeholder="例如：想写春天的雨，思念远方的朋友…"
+            style="width:100%;padding:9px 11px;border:1px solid rgba(26,16,8,0.17);
+            background:rgba(255,255,255,0.5);font-family:'Noto Serif SC',serif;
+            font-size:0.68rem;letter-spacing:0.1em;line-height:1.75;
+            resize:none;height:66px;color:var(--ink);outline:none;"></textarea>
+        </div>
+        <button class="ai-gen-btn" id="aiGenBtn">
+          <span class="shimmer"></span>🖌 开始创作
+        </button>
+        <div class="ai-loading" id="aiLoading">
+          <span class="ai-bird">🐦</span>
+          <span class="ai-loading-t">小趣正在挥毫泼墨…</span>
+        </div>
+        <div class="ai-result" id="aiResult"></div>
+        <div id="aiHistSec" style="display:none">
+          <div class="sec" style="margin-top:18px"><span>创作历史</span></div>
+          <div id="aiHistList"></div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ══ ME ══ -->
+    <div class="pg" id="pg-me">
+      <div class="stabs">
+        <button class="stab on" data-sub="me-bird">🐦 小趣</button>
+        <button class="stab" data-sub="me-rank">🏆 排行</button>
+      </div>
+      <div class="spg on" id="spg-me-bird">
+        <div class="inner">
+          <div class="bird-wrap">
+            <svg class="bird-svg" viewBox="0 0 120 120">
+              <ellipse cx="60" cy="72" rx="28" ry="22" fill="#4caf50"/>
+              <circle cx="60" cy="44" r="18" fill="#4caf50"/>
+              <polygon points="60,50 72,46 60,56" fill="#ff9800"/>
+              <circle cx="65" cy="40" r="4" fill="white"/>
+              <circle cx="66" cy="40" r="2" fill="#1a1008"/>
+              <ellipse cx="38" cy="70" rx="12" ry="18" fill="#388e3c" transform="rotate(-20,38,70)"/>
+              <ellipse cx="82" cy="70" rx="12" ry="18" fill="#388e3c" transform="rotate(20,82,70)"/>
+              <ellipse cx="60" cy="92" rx="10" ry="6" fill="#2e7d32"/>
+              <line x1="52" y1="94" x2="48" y2="106" stroke="#ff9800" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="52" y1="106" x2="44" y2="106" stroke="#ff9800" stroke-width="2" stroke-linecap="round"/>
+              <line x1="52" y1="106" x2="52" y2="112" stroke="#ff9800" stroke-width="2" stroke-linecap="round"/>
+              <line x1="68" y1="94" x2="72" y2="106" stroke="#ff9800" stroke-width="2.5" stroke-linecap="round"/>
+              <line x1="72" y1="106" x2="80" y2="106" stroke="#ff9800" stroke-width="2" stroke-linecap="round"/>
+              <line x1="72" y1="106" x2="72" y2="112" stroke="#ff9800" stroke-width="2" stroke-linecap="round"/>
+              <g id="costumeLayer"></g>
+            </svg>
+            <div class="bird-name">小趣</div>
+            <div class="bird-lv" id="birdLv"></div>
+            <div class="rank-big" id="rankBig"></div>
+          </div>
+          <div class="xubi-row">
+            <span>🪙</span>
+            <span style="font-size:0.62rem;letter-spacing:0.18em;color:var(--ink2)">趣币余额</span>
+            <span class="xubi-val" id="birdXubi">0</span>
+          </div>
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+              <span style="font-size:0.6rem;letter-spacing:0.2em;color:var(--ink2)">经验值</span>
+              <span style="font-size:0.52rem;color:var(--ink2);letter-spacing:0.12em" id="expLbl"></span>
+            </div>
+            <div class="exp-bg"><div class="exp-fill" id="expFill" style="width:0%"></div></div>
+            <div class="exp-meta"><span id="curRankLbl"></span><span id="nextRankLbl"></span></div>
+          </div>
+          <div class="sec"><span>服装衣橱</span></div>
+          <div class="co-grid" id="coGrid"></div>
+        </div>
+      </div>
+      <div class="spg" id="spg-me-rank">
+        <div class="inner">
+          <div class="sec" style="margin-top:4px"><span>班级排行榜</span></div>
+          <div style="display:flex;gap:7px;margin-bottom:11px">
+            <button class="qm" style="background:var(--ink);color:var(--paper)" onclick="renderRank()">本周</button>
+            <button class="qm" style="background:var(--paper2);color:var(--ink2)" onclick="renderRank()">总榜</button>
+          </div>
+          <div class="card" style="padding:0">
+            <div class="lb-hd"><span>排名</span><span>同学</span><span style="text-align:right">趣币</span><span style="text-align:right">段位</span></div>
+            <div id="rankList"></div>
+          </div>
+          <div class="sec" style="margin-top:14px"><span>我的成就</span></div>
+          <div class="sg" id="myStats"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- MODAL -->
+  <div class="ov" id="ov">
+    <div class="modal" id="modal">
+      <button class="modal-x" id="modalX">关 ×</button>
+      <div class="modal-in">
+        <div class="modal-tags" id="modalTags"></div>
+        <h2 class="modal-title" id="modalTitle"></h2>
+        <p class="modal-poet" id="modalPoet"></p>
+        <div class="modal-body" id="modalBody"></div>
+        <p class="modal-nl">赏析</p>
+        <p class="modal-notes" id="modalNotes"></p>
+        <div class="modal-acts">
+          <button class="mact" style="background:var(--seal);color:#f7f2e8" id="modalQuiz">✍️ 出题考我</button>
+          <button class="mact" style="background:var(--gold);color:#fff" id="modalRec">🎤 开始跟读</button>
+        </div>
+
+        <!-- POET CHAT -->
+        <div class="call-btn-wrap">
+          <button class="call-btn" id="callBtn">
+            <span class="call-btn-icon">📞</span>
+            与诗人通话
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+
+<div class="toast" id="toast"></div>
+
+  <!-- BOTTOM NAV -->
+  <nav id="nav">
+    <button class="nv on" data-pg="home"><span class="ni">🏠</span>首页</button>
+    <button class="nv" data-pg="learn"><span class="ni">📖</span>学</button>
+    <button class="nv" data-pg="test"><span class="ni">✍️</span>练</button>
+    <button class="nv" data-pg="poets"><span class="ni">📞</span>诗人</button>
+    <button class="nv" data-pg="ai"><span class="ni">✨</span>AI</button>
+    <button class="nv" data-pg="me"><span class="ni">🐦</span>我</button>
+  </nav>
+</div><!-- /app -->
+
+<script>
+var POEMS     = [{"id": 1, "title": "春晓", "author": "孟浩然", "dynasty": "唐", "season": ["春"], "weather": ["雨"], "mood": ["惬意", "宁静"], "jieqi": ["清明", "谷雨"], "lines": [{"text": "春眠不觉晓，", "pinyin": "chūn mián bù jué xiǎo，"}, {"text": "处处闻啼鸟。", "pinyin": "chù chù wén tí niǎo。"}, {"text": "夜来风雨声，", "pinyin": "yè lái fēng yǔ shēng，"}, {"text": "花落知多少。", "pinyin": "huā luò zhī duō shǎo。"}], "excerpt": "春眠不觉晓，处处闻啼鸟", "weatherTag": "☔ 春雨", "theme": ["山水", "田园"], "form": ["五言绝句"], "lifestage": ["童年", "青春"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "诗人春日早晨，于半梦半醒之际听闻鸟鸣，心生惬意。末句以\"花落知多少\"留下无尽遐思，淡淡的惜春之情呼之欲出，是绝佳的春晨写照。", "img": "1516912481800-cf00b3a15083"}, {"id": 2, "title": "静夜思", "author": "李白", "dynasty": "唐", "season": ["秋", "冬"], "weather": ["晴", "月明"], "mood": ["思乡", "孤独"], "jieqi": ["中秋"], "lines": [{"text": "床前明月光，", "pinyin": "chuáng qián míng yuè guāng，"}, {"text": "疑是地上霜。", "pinyin": "yí shì dì shàng shuāng。"}, {"text": "举头望明月，", "pinyin": "jǔ tóu wàng míng yuè，"}, {"text": "低头思故乡。", "pinyin": "dī tóu sī gù xiāng。"}], "excerpt": "举头望明月，低头思故乡", "weatherTag": "🌕 月明", "theme": ["思乡", "羁旅"], "form": ["五言绝句"], "lifestage": ["中年", "晚年"], "intensity": ["深沉"], "agegroup": ["小朋友", "成人"], "notes": "月光如霜的深夜，诗人于旅途中仰望明月，无尽乡愁涌上心头。全诗二十字，却将游子思乡之情表达得入木三分，千年来令无数读者动容。", "img": "1532767153582-4e89bfd43a68"}, {"id": 3, "title": "枫桥夜泊", "author": "张继", "dynasty": "唐", "season": ["秋"], "weather": ["霜", "月明"], "mood": ["孤独", "忧愁"], "jieqi": ["寒露", "霜降"], "lines": [{"text": "月落乌啼霜满天，", "pinyin": "yuè luò wū tí shuāng mǎn tiān，"}, {"text": "江枫渔火对愁眠。", "pinyin": "jiāng fēng yú huǒ duì chóu mián。"}, {"text": "姑苏城外寒山寺，", "pinyin": "gū sū chéng wài hán shān sì，"}, {"text": "夜半钟声到客船。", "pinyin": "yè bàn zhōng shēng dào kè chuán。"}], "excerpt": "月落乌啼霜满天，江枫渔火对愁眠", "weatherTag": "🌫 霜寒", "theme": ["羁旅", "山水"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["哀婉"], "agegroup": ["成人"], "notes": "秋夜泊船枫桥，霜气满天，钟声悠远。诗人以视觉、听觉交织，将羁旅之愁渲染得凄清幽远。那一声寒山寺的夜半钟，穿越千年仍萦绕耳畔。", "img": "1508739773434-c26b3d09e071"}, {"id": 4, "title": "咏柳", "author": "贺知章", "dynasty": "唐", "season": ["春"], "weather": ["晴", "风"], "mood": ["喜悦", "惬意"], "jieqi": ["立春", "春分"], "lines": [{"text": "碧玉妆成一树高，", "pinyin": "bì yù zhuāng chéng yī shù gāo，"}, {"text": "万条垂下绿丝绦。", "pinyin": "wàn tiáo chuí xià lǜ sī tāo。"}, {"text": "不知细叶谁裁出，", "pinyin": "bù zhī xì yè shuí cái chū，"}, {"text": "二月春风似剪刀。", "pinyin": "èr yuè chūn fēng sì jiǎn dāo。"}], "excerpt": "不知细叶谁裁出，二月春风似剪刀", "weatherTag": "🌱 春风", "theme": ["咏物", "山水"], "form": ["七言绝句"], "lifestage": ["青春"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "诗人以碧玉喻柳，以丝绦喻枝，以剪刀喻春风，比喻新奇而贴切。结尾一问一答，将无形的春风拟人化，写活了早春的生机与巧思。", "img": "1558618666-fcd25c85cd64"}, {"id": 5, "title": "望庐山瀑布", "author": "李白", "dynasty": "唐", "season": ["夏"], "weather": ["晴", "雾"], "mood": ["壮阔", "喜悦"], "jieqi": ["夏至"], "lines": [{"text": "日照香炉生紫烟，", "pinyin": "rì zhào xiāng lú shēng zǐ yān，"}, {"text": "遥看瀑布挂前川。", "pinyin": "yáo kàn pù bù guà qián chuān。"}, {"text": "飞流直下三千尺，", "pinyin": "fēi liú zhí xià sān qiān chǐ，"}, {"text": "疑是银河落九天。", "pinyin": "yí shì yín hé luò jiǔ tiān。"}], "excerpt": "飞流直下三千尺，疑是银河落九天", "weatherTag": "☀ 晴日", "theme": ["山水"], "form": ["七言绝句"], "lifestage": ["青春"], "intensity": ["激昂"], "agegroup": ["小朋友", "成人"], "notes": "李白以夸张的浪漫笔法，描绘庐山瀑布的磅礴气势。三千尺与九天极尽夸张，却让人信服。紫烟、银河，将自然山水升华为仙境，尽显诗仙豪情。", "img": "1433086966628-a7f8e2f84a73"}, {"id": 6, "title": "夜雪", "author": "白居易", "dynasty": "唐", "season": ["冬"], "weather": ["雪"], "mood": ["宁静", "孤独"], "jieqi": ["大雪", "冬至"], "lines": [{"text": "已讶衾枕冷，", "pinyin": "yǐ yà qīn zhěn lěng，"}, {"text": "复见窗户明。", "pinyin": "fù jiàn chuāng hù míng。"}, {"text": "夜深知雪重，", "pinyin": "yè shēn zhī xuě zhòng，"}, {"text": "时闻折竹声。", "pinyin": "shí wén zhé zhú shēng。"}], "excerpt": "夜深知雪重，时闻折竹声", "weatherTag": "❄ 夜雪", "theme": ["田园", "山水"], "form": ["五言绝句"], "lifestage": ["中年"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "诗人在冬夜感受到被褥的寒冷，看到窗户的明亮，侧耳倾听折竹之声，以极为细腻的感官体验，烘托出大雪纷飞的冬夜意境，安静中透着清冷。", "img": "1491002052546-bf38f186af56"}, {"id": 7, "title": "山居秋暝", "author": "王维", "dynasty": "唐", "season": ["秋"], "weather": ["雨", "月明"], "mood": ["宁静", "惬意"], "jieqi": ["秋分", "寒露"], "lines": [{"text": "空山新雨后，", "pinyin": "kōng shān xīn yǔ hòu，"}, {"text": "天气晚来秋。", "pinyin": "tiān qì wǎn lái qiū。"}, {"text": "明月松间照，", "pinyin": "míng yuè sōng jiān zhào，"}, {"text": "清泉石上流。", "pinyin": "qīng quán shí shàng liú。"}, {"text": "竹喧归浣女，", "pinyin": "zhú xuān guī huàn nǚ，"}, {"text": "莲动下渔舟。", "pinyin": "lián dòng xià yú zhōu。"}, {"text": "随意春芳歇，", "pinyin": "suí yì chūn fāng xiē，"}, {"text": "王孙自可留。", "pinyin": "wáng sūn zì kě liú。"}], "excerpt": "明月松间照，清泉石上流", "weatherTag": "🌧 秋雨后", "theme": ["山水", "田园"], "form": ["五言律诗"], "lifestage": ["中年"], "intensity": ["轻盈"], "agegroup": ["成人"], "notes": "雨后山林，明月、松影、清泉、石涧，王维用简洁的笔墨勾勒出秋山的清幽。诗中有画，画中有诗，此诗是最好的注解，令人心旷神怡，尘虑尽消。", "img": "1510797215324-95aa89f43c33"}, {"id": 8, "title": "赠汪伦", "author": "李白", "dynasty": "唐", "season": ["春"], "weather": ["晴"], "mood": ["感动", "喜悦"], "jieqi": ["清明"], "lines": [{"text": "李白乘舟将欲行，", "pinyin": "lǐ bái chéng zhōu jiāng yù xíng，"}, {"text": "忽闻岸上踏歌声。", "pinyin": "hū wén àn shàng tà gē shēng。"}, {"text": "桃花潭水深千尺，", "pinyin": "táo huā tán shuǐ shēn qiān chǐ，"}, {"text": "不及汪伦送我情。", "pinyin": "bù jí wāng lún sòng wǒ qíng。"}], "excerpt": "桃花潭水深千尺，不及汪伦送我情", "weatherTag": "🌸 春晴", "theme": ["送别", "友情"], "form": ["七言绝句"], "lifestage": ["青春"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "诗人即将离去，忽闻送行之声，感动之情油然而生。以深千尺的桃花潭水比友情之深，真挚而豪迈，是友情诗中最动人的名句之一。", "img": "1464822759023-fed622ff2c3b"}, {"id": 9, "title": "江雪", "author": "柳宗元", "dynasty": "唐", "season": ["冬"], "weather": ["雪"], "mood": ["孤独", "宁静"], "jieqi": ["小雪", "大雪", "冬至"], "lines": [{"text": "千山鸟飞绝，", "pinyin": "qiān shān niǎo fēi jué，"}, {"text": "万径人踪灭。", "pinyin": "wàn jìng rén zōng miè。"}, {"text": "孤舟蓑笠翁，", "pinyin": "gū zhōu suō lì wēng，"}, {"text": "独钓寒江雪。", "pinyin": "dú diào hán jiāng xuě。"}], "excerpt": "孤舟蓑笠翁，独钓寒江雪", "weatherTag": "❄ 江雪", "theme": ["山水"], "form": ["五言绝句"], "lifestage": ["中年"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "千山万径，一片寂静，唯一叶孤舟上的老翁垂钓江雪之中。以极大的空旷衬托极深的孤独，这是诗人被贬谪后心境的写照，孤寂而傲岸。", "img": "1551524559-8af4e6624178"}, {"id": 10, "title": "登鹳雀楼", "author": "王之涣", "dynasty": "唐", "season": ["秋"], "weather": ["晴"], "mood": ["壮阔", "惬意"], "jieqi": ["秋分"], "lines": [{"text": "白日依山尽，", "pinyin": "bái rì yī shān jìn，"}, {"text": "黄河入海流。", "pinyin": "huáng hé rù hǎi liú。"}, {"text": "欲穷千里目，", "pinyin": "yù qióng qiān lǐ mù，"}, {"text": "更上一层楼。", "pinyin": "gèng shàng yī céng lóu。"}], "excerpt": "欲穷千里目，更上一层楼", "weatherTag": "🌅 晚晴", "theme": ["登高", "哲理"], "form": ["五言绝句"], "lifestage": ["青春"], "intensity": ["激昂"], "agegroup": ["小朋友", "成人"], "notes": "登高望远，夕阳西下，黄河东流，壮阔的自然景象中蕴含深刻的人生哲理：要想看得更远，就必须站得更高。千百年来激励无数人不断进取。", "img": "1470770841072-f978cf4d019e"}, {"id": 11, "title": "凉州词", "author": "王翰", "dynasty": "唐", "season": ["秋"], "weather": ["晴"], "mood": ["壮阔", "感动"], "jieqi": ["秋分", "寒露"], "lines": [{"text": "葡萄美酒夜光杯，", "pinyin": "pú táo měi jiǔ yè guāng bēi，"}, {"text": "欲饮琵琶马上催。", "pinyin": "yù yǐn pí pá mǎ shàng cuī。"}, {"text": "醉卧沙场君莫笑，", "pinyin": "zuì wò shā chǎng jūn mò xiào，"}, {"text": "古来征战几人回。", "pinyin": "gǔ lái zhēng zhàn jǐ rén huí。"}], "excerpt": "醉卧沙场君莫笑，古来征战几人回", "weatherTag": "🍂 秋塞", "theme": ["边塞"], "form": ["七言绝句"], "lifestage": ["晚年"], "intensity": ["激昂"], "agegroup": ["成人"], "notes": "出征前夜，葡萄美酒，琵琶催征。醉卧沙场的豪放背后是对生死的淡然。末句以问作答，道尽边塞将士的慷慨悲歌，是边塞诗中的旷世名篇。", "img": "1509316785289-025f5b846b35"}, {"id": 12, "title": "出塞", "author": "王昌龄", "dynasty": "唐", "season": ["秋"], "weather": ["月明"], "mood": ["壮阔", "忧愁"], "jieqi": ["秋分"], "lines": [{"text": "秦时明月汉时关，", "pinyin": "qín shí míng yuè hàn shí guān，"}, {"text": "万里长征人未还。", "pinyin": "wàn lǐ cháng zhēng rén wèi huán。"}, {"text": "但使龙城飞将在，", "pinyin": "dàn shǐ lóng chéng fēi jiāng zài，"}, {"text": "不教胡马度阴山。", "pinyin": "bù jiào hú mǎ dù yīn shān。"}], "excerpt": "秦时明月汉时关，万里长征人未还", "weatherTag": "🌕 边月", "theme": ["边塞"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["激昂"], "agegroup": ["成人"], "notes": "明月与关塞，贯穿秦汉两朝，万里征人至今未归。诗人借古伤今，寄托了对和平的渴望与对戍边将士的深切同情，被誉为唐代七绝压卷之作。", "img": "1532294220198-45e1ea2b4b35"}, {"id": 13, "title": "望天门山", "author": "李白", "dynasty": "唐", "season": ["夏"], "weather": ["晴"], "mood": ["壮阔", "喜悦"], "jieqi": ["夏至"], "lines": [{"text": "天门中断楚江开，", "pinyin": "tiān mén zhōng duàn chǔ jiāng kāi，"}, {"text": "碧水东流至此回。", "pinyin": "bì shuǐ dōng liú zhì cǐ huí。"}, {"text": "两岸青山相对出，", "pinyin": "liǎng àn qīng shān xiāng duì chū，"}, {"text": "孤帆一片日边来。", "pinyin": "gū fān yī piàn rì biān lái。"}], "excerpt": "两岸青山相对出，孤帆一片日边来", "weatherTag": "☀ 江晴", "theme": ["山水"], "form": ["七言绝句"], "lifestage": ["青春"], "intensity": ["激昂"], "agegroup": ["成人"], "notes": "李白乘舟途经天门山，以动写静，以静衬动。两岸青山如迎面而来，一叶孤帆从日边驶来，画面雄浑壮阔，充满了诗仙特有的豪迈气象。", "img": "1506905925346-21bda4d32df4"}, {"id": 14, "title": "早发白帝城", "author": "李白", "dynasty": "唐", "season": ["春"], "weather": ["晴"], "mood": ["喜悦", "壮阔"], "jieqi": ["春分"], "lines": [{"text": "朝辞白帝彩云间，", "pinyin": "zhāo cí bái dì cǎi yún jiān，"}, {"text": "千里江陵一日还。", "pinyin": "qiān lǐ jiāng líng yī rì huán。"}, {"text": "两岸猿声啼不住，", "pinyin": "liǎng àn yuán shēng tí bú zhù，"}, {"text": "轻舟已过万重山。", "pinyin": "qīng zhōu yǐ guò wàn chóng shān。"}], "excerpt": "轻舟已过万重山", "weatherTag": "🌤 晨晴", "theme": ["山水", "羁旅"], "form": ["七言绝句"], "lifestage": ["青春"], "intensity": ["激昂"], "agegroup": ["小朋友", "成人"], "notes": "李白遇赦后顺江东下，喜悦之情溢于言表。彩云、猿声、万重山，景物飞逝，轻舟如飞，将诗人获释后的轻快心情表现得淋漓尽致。", "img": "1507003211169-0a1dd7228f2d"}, {"id": 15, "title": "黄鹤楼送孟浩然之广陵", "author": "李白", "dynasty": "唐", "season": ["春"], "weather": ["晴"], "mood": ["思念", "感动"], "jieqi": ["清明", "谷雨"], "lines": [{"text": "故人西辞黄鹤楼，", "pinyin": "gù rén xī cí huáng hè lóu，"}, {"text": "烟花三月下扬州。", "pinyin": "yān huā sān yuè xià yáng zhōu。"}, {"text": "孤帆远影碧空尽，", "pinyin": "gū fān yuǎn yǐng bì kōng jìn，"}, {"text": "唯见长江天际流。", "pinyin": "wéi jiàn cháng jiāng tiān jì liú。"}], "excerpt": "烟花三月下扬州", "weatherTag": "🌸 烟花", "theme": ["送别", "友情"], "form": ["七言绝句"], "lifestage": ["青春"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "三月烟花，黄鹤楼畔，目送友人孤帆远去，直至消失天际，唯余长江向东奔流。不言离别之情，却将依依惜别之意写得深入骨髓。", "img": "1528360983277-13d401cdc186"}, {"id": 16, "title": "登高", "author": "杜甫", "dynasty": "唐", "season": ["秋"], "weather": ["风"], "mood": ["忧愁", "壮阔"], "jieqi": ["重阳", "霜降"], "lines": [{"text": "风急天高猿啸哀，", "pinyin": "fēng jí tiān gāo yuán xiào āi，"}, {"text": "渚清沙白鸟飞回。", "pinyin": "zhǔ qīng shā bái niǎo fēi huí。"}, {"text": "无边落木萧萧下，", "pinyin": "wú biān luò mù xiāo xiāo xià，"}, {"text": "不尽长江滚滚来。", "pinyin": "bù jìn cháng jiāng gǔn gǔn lái。"}, {"text": "万里悲秋常作客，", "pinyin": "wàn lǐ bēi qiū cháng zuò kè，"}, {"text": "百年多病独登台。", "pinyin": "bǎi nián duō bìng dú dēng tái。"}, {"text": "艰难苦恨繁霜鬓，", "pinyin": "jiān nán kǔ hèn fán shuāng bìn，"}, {"text": "潦倒新停浊酒杯。", "pinyin": "liáo dǎo xīn tíng zhuó jiǔ bēi。"}], "excerpt": "无边落木萧萧下，不尽长江滚滚来", "weatherTag": "🍂 秋风", "theme": ["登高", "羁旅"], "form": ["七言律诗"], "lifestage": ["晚年"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "被誉为古今第一律诗。杜甫晚年登高，秋风猎猎，落叶萧萧，长江滚滚，以宏大的自然景象映衬个人的漂泊与老病，沉郁顿挫，气象万千。", "img": "1504701954957-2010ec3bcec1"}, {"id": 17, "title": "春望", "author": "杜甫", "dynasty": "唐", "season": ["春"], "weather": ["晴"], "mood": ["忧愁", "思乡"], "jieqi": ["春分", "清明"], "lines": [{"text": "国破山河在，", "pinyin": "guó pò shān hé zài，"}, {"text": "城春草木深。", "pinyin": "chéng chūn cǎo mù shēn。"}, {"text": "感时花溅泪，", "pinyin": "gǎn shí huā jiàn lèi，"}, {"text": "恨别鸟惊心。", "pinyin": "hèn bié niǎo jīng xīn。"}, {"text": "烽火连三月，", "pinyin": "fēng huǒ lián sān yuè，"}, {"text": "家书抵万金。", "pinyin": "jiā shū dǐ wàn jīn。"}, {"text": "白头搔更短，", "pinyin": "bái tóu sāo gèng duǎn，"}, {"text": "浑欲不胜簪。", "pinyin": "hún yù bù shèng zān。"}], "excerpt": "烽火连三月，家书抵万金", "weatherTag": "🌿 春深", "theme": ["忧国", "战争"], "form": ["五言律诗"], "lifestage": ["中年"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "安史之乱中，长安沦陷，山河依旧，却满目疮痍。花因感时而溅泪，鸟因恨别而惊心，家书万金，白发愈稀，字字血泪，是乱世中最深沉的呐喊。", "img": "1501854140801-50d01698950b"}, {"id": 18, "title": "绝句", "author": "杜甫", "dynasty": "唐", "season": ["春"], "weather": ["晴"], "mood": ["喜悦", "惬意"], "jieqi": ["春分", "清明"], "lines": [{"text": "两个黄鹂鸣翠柳，", "pinyin": "liǎng gè huáng lí míng cuì liǔ，"}, {"text": "一行白鹭上青天。", "pinyin": "yī háng bái lù shàng qīng tiān。"}, {"text": "窗含西岭千秋雪，", "pinyin": "chuāng hán xī lǐng qiān qiū xuě，"}, {"text": "门泊东吴万里船。", "pinyin": "mén pō dōng wú wàn lǐ chuán。"}], "excerpt": "两个黄鹂鸣翠柳，一行白鹭上青天", "weatherTag": "☀ 春晴", "theme": ["山水", "田园"], "form": ["七言绝句"], "lifestage": ["青春"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "四句诗，四幅画：黄鹂翠柳、白鹭青天、西岭积雪、东吴归船，色彩鲜明，生机盎然。这是杜甫草堂春日所见，难得的轻快明朗之作。", "img": "1518173946687-a4c8892bbd9f"}, {"id": 19, "title": "望岳", "author": "杜甫", "dynasty": "唐", "season": ["夏"], "weather": ["晴", "雾"], "mood": ["壮阔", "喜悦"], "jieqi": ["夏至"], "lines": [{"text": "岱宗夫如何？", "pinyin": "dài zōng fū rú hé？"}, {"text": "齐鲁青未了。", "pinyin": "qí lǔ qīng wèi liǎo。"}, {"text": "造化钟神秀，", "pinyin": "zào huà zhōng shén xiù，"}, {"text": "阴阳割昏晓。", "pinyin": "yīn yáng gē hūn xiǎo。"}, {"text": "荡胸生曾云，", "pinyin": "dàng xiōng shēng céng yún，"}, {"text": "决眦入归鸟。", "pinyin": "jué zì rù guī niǎo。"}, {"text": "会当凌绝顶，", "pinyin": "huì dāng líng jué dǐng，"}, {"text": "一览众山小。", "pinyin": "yī lǎn zhòng shān xiǎo。"}], "excerpt": "会当凌绝顶，一览众山小", "weatherTag": "⛰ 山晴", "theme": ["登高", "山水"], "form": ["五言律诗"], "lifestage": ["青春"], "intensity": ["激昂"], "agegroup": ["成人"], "notes": "杜甫年轻时游历泰山所作。全诗由远及近，由仰观到俯瞰，末句会当凌绝顶，一览众山小，道出了不畏艰难、勇攀高峰的豪情壮志。", "img": "1464278533981-50106e6176b1"}, {"id": 20, "title": "相思", "author": "王维", "dynasty": "唐", "season": ["秋", "冬"], "weather": ["晴"], "mood": ["思念", "惬意"], "jieqi": ["寒露"], "lines": [{"text": "红豆生南国，", "pinyin": "hóng dòu shēng nán guó，"}, {"text": "春来发几枝。", "pinyin": "chūn lái fā jǐ zhī。"}, {"text": "愿君多采撷，", "pinyin": "yuàn jūn duō cǎi xié，"}, {"text": "此物最相思。", "pinyin": "cǐ wù zuì xiāng sī。"}], "excerpt": "红豆生南国，春来发几枝", "weatherTag": "❤ 相思", "theme": ["相思", "咏物"], "form": ["五言绝句"], "lifestage": ["青春", "中年"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "红豆又名相思子，诗人借红豆寄托相思之情。全诗语言朴素自然，情感真挚深沉，以物寄情，含蓄而深婉，是流传最广的相思诗之一。", "img": "1578662996442-48f60103fc96"}, {"id": 21, "title": "九月九日忆山东兄弟", "author": "王维", "dynasty": "唐", "season": ["秋"], "weather": ["晴"], "mood": ["思乡", "孤独"], "jieqi": ["重阳"], "lines": [{"text": "独在异乡为异客，", "pinyin": "dú zài yì xiāng wéi yì kè，"}, {"text": "每逢佳节倍思亲。", "pinyin": "měi féng jiā jié bèi sī qīn。"}, {"text": "遥知兄弟登高处，", "pinyin": "yáo zhī xiōng dì dēng gāo chù，"}, {"text": "遍插茱萸少一人。", "pinyin": "biàn chā zhū yú shǎo yī rén。"}], "excerpt": "独在异乡为异客，每逢佳节倍思亲", "weatherTag": "🍂 重阳", "theme": ["思乡", "节日"], "form": ["七言绝句"], "lifestage": ["青春", "中年"], "intensity": ["深沉"], "agegroup": ["小朋友", "成人"], "notes": "重阳佳节，诗人独在异乡，思念亲人之情倍加强烈。末句以遥想兄弟登高时少自己一人收束，将思念之情写得含蓄而深远，历久弥新。", "img": "1508739773434-c26b3d09e071"}, {"id": 22, "title": "鹿柴", "author": "王维", "dynasty": "唐", "season": ["秋"], "weather": ["晴"], "mood": ["宁静", "惬意"], "jieqi": ["秋分"], "lines": [{"text": "空山不见人，", "pinyin": "kōng shān bú jiàn rén，"}, {"text": "但闻人语响。", "pinyin": "dàn wén rén yǔ xiǎng。"}, {"text": "返景入深林，", "pinyin": "fǎn jǐng rù shēn lín，"}, {"text": "复照青苔上。", "pinyin": "fù zhào qīng tái shàng。"}], "excerpt": "空山不见人，但闻人语响", "weatherTag": "🌲 林静", "theme": ["山水", "田园"], "form": ["五言绝句"], "lifestage": ["中年"], "intensity": ["轻盈"], "agegroup": ["成人"], "notes": "空山无人，却有声音；深林幽暗，却有光影。王维以禅宗的视角写自然，以声衬寂，以光衬幽，呈现出一种超凡脱俗的空灵之境。", "img": "1448375240586-882707db888b"}, {"id": 23, "title": "送元二使安西", "author": "王维", "dynasty": "唐", "season": ["春"], "weather": ["雨"], "mood": ["感动", "忧愁"], "jieqi": ["清明", "谷雨"], "lines": [{"text": "渭城朝雨浥轻尘，", "pinyin": "wèi chéng zhāo yǔ yì qīng chén，"}, {"text": "客舍青青柳色新。", "pinyin": "kè shè qīng qīng liǔ sè xīn。"}, {"text": "劝君更尽一杯酒，", "pinyin": "quàn jūn gèng jìn yī bēi jiǔ，"}, {"text": "西出阳关无故人。", "pinyin": "xī chū yáng guān wú gù rén。"}], "excerpt": "劝君更尽一杯酒，西出阳关无故人", "weatherTag": "🌧 朝雨", "theme": ["送别", "友情"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "渭城清晨细雨，柳色清新，即将西行出使的友人面前，诗人举杯相劝：再饮一杯，出了阳关便再无故交。情深意重，被谱成阳关三叠广为传唱。", "img": "1519692933481-e162a57d6721"}, {"id": 24, "title": "滁州西涧", "author": "韦应物", "dynasty": "唐", "season": ["春"], "weather": ["雨"], "mood": ["宁静", "惬意"], "jieqi": ["谷雨", "清明"], "lines": [{"text": "独怜幽草涧边生，", "pinyin": "dú lián yōu cǎo jiàn biān shēng，"}, {"text": "上有黄鹂深树鸣。", "pinyin": "shàng yǒu huáng lí shēn shù míng。"}, {"text": "春潮带雨晚来急，", "pinyin": "chūn cháo dài yǔ wǎn lái jí，"}, {"text": "野渡无人舟自横。", "pinyin": "yě dù wú rén zhōu zì héng。"}], "excerpt": "野渡无人舟自横", "weatherTag": "🌿 春涧", "theme": ["山水", "田园"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["轻盈"], "agegroup": ["成人"], "notes": "幽草涧边，黄鹂深树，春潮带雨，野渡无人。末句野渡无人舟自横最为传神，以无人之渡、自横之舟写出一种自在闲适、与世无争的境界。", "img": "1470770841072-f978cf4d019e"}, {"id": 25, "title": "乌衣巷", "author": "刘禹锡", "dynasty": "唐", "season": ["春"], "weather": ["晴"], "mood": ["忧愁", "宁静"], "jieqi": ["春分"], "lines": [{"text": "朱雀桥边野草花，", "pinyin": "zhū què qiáo biān yě cǎo huā，"}, {"text": "乌衣巷口夕阳斜。", "pinyin": "wū yī xiàng kǒu xī yáng xié。"}, {"text": "旧时王谢堂前燕，", "pinyin": "jiù shí wáng xiè táng qián yàn，"}, {"text": "飞入寻常百姓家。", "pinyin": "fēi rù xún cháng bǎi xìng jiā。"}], "excerpt": "旧时王谢堂前燕，飞入寻常百姓家", "weatherTag": "🌅 夕阳", "theme": ["咏史", "怀古"], "form": ["七言绝句"], "lifestage": ["晚年"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "昔日繁华的乌衣巷，如今野草丛生，夕阳西斜。王谢两大家族堂前的燕子，如今飞入了普通百姓家。沧桑之感，尽在不言中，是咏史怀古的绝唱。", "img": "1514924013411-cbf25faa35bb"}, {"id": 26, "title": "题都城南庄", "author": "崔护", "dynasty": "唐", "season": ["春"], "weather": ["晴"], "mood": ["思念", "忧愁"], "jieqi": ["清明", "春分"], "lines": [{"text": "去年今日此门中，", "pinyin": "qù nián jīn rì cǐ mén zhōng，"}, {"text": "人面桃花相映红。", "pinyin": "rén miàn táo huā xiāng yìng hóng。"}, {"text": "人面不知何处去，", "pinyin": "rén miàn bù zhī hé chù qù，"}, {"text": "桃花依旧笑春风。", "pinyin": "táo huā yī jiù xiào chūn fēng。"}], "excerpt": "人面不知何处去，桃花依旧笑春风", "weatherTag": "🌸 桃花", "theme": ["相思", "爱情"], "form": ["七言绝句"], "lifestage": ["青春"], "intensity": ["哀婉"], "agegroup": ["成人"], "notes": "去年桃花下邂逅的美丽女子，今年寻访已不见踪影，唯有桃花依旧灿烂。人去花在，物是人非，短短二十八字，道尽了人生的无常与相思之苦。", "img": "1516912481800-cf00b3a15083"}, {"id": 27, "title": "游子吟", "author": "孟郊", "dynasty": "唐", "season": ["春"], "weather": ["晴"], "mood": ["感动", "思念"], "jieqi": ["春分"], "lines": [{"text": "慈母手中线，", "pinyin": "cí mǔ shǒu zhōng xiàn，"}, {"text": "游子身上衣。", "pinyin": "yóu zǐ shēn shàng yī。"}, {"text": "临行密密缝，", "pinyin": "lín xíng mì mì féng，"}, {"text": "意恐迟迟归。", "pinyin": "yì kǒng chí chí guī。"}, {"text": "谁言寸草心，", "pinyin": "shuí yán cùn cǎo xīn，"}, {"text": "报得三春晖。", "pinyin": "bào dé sān chūn huī。"}], "excerpt": "谁言寸草心，报得三春晖", "weatherTag": "🌿 春晖", "theme": ["亲情"], "form": ["五言古诗"], "lifestage": ["中年", "晚年"], "intensity": ["深沉"], "agegroup": ["小朋友", "成人"], "notes": "母亲在灯下为即将远行的儿子缝衣，每一针每一线都饱含深情。寸草之心难以报答三春阳光，以自然之喻道出母恩之深厚，感人至深，千古传诵。", "img": "1474552226712-ac0f0961a954"}, {"id": 28, "title": "清明", "author": "杜牧", "dynasty": "唐", "season": ["春"], "weather": ["雨"], "mood": ["忧愁", "宁静"], "jieqi": ["清明"], "lines": [{"text": "清明时节雨纷纷，", "pinyin": "qīng míng shí jié yǔ fēn fēn，"}, {"text": "路上行人欲断魂。", "pinyin": "lù shàng xíng rén yù duàn hún。"}, {"text": "借问酒家何处有？", "pinyin": "jiè wèn jiǔ jiā hé chù yǒu？"}, {"text": "牧童遥指杏花村。", "pinyin": "mù tóng yáo zhǐ xìng huā cūn。"}], "excerpt": "清明时节雨纷纷，路上行人欲断魂", "weatherTag": "☔ 清明雨", "theme": ["节日", "羁旅"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "清明时节，细雨绵绵，行人愁肠欲断，借问酒家，牧童遥指杏花村。全诗如一幅水墨画，意境清新，韵味悠长，是清明时节最应景的诗作。", "img": "1522748906645-8d981c2e0db3"}, {"id": 29, "title": "山行", "author": "杜牧", "dynasty": "唐", "season": ["秋"], "weather": ["晴"], "mood": ["喜悦", "壮阔"], "jieqi": ["霜降", "寒露"], "lines": [{"text": "远上寒山石径斜，", "pinyin": "yuǎn shàng hán shān shí jìng xié，"}, {"text": "白云生处有人家。", "pinyin": "bái yún shēng chù yǒu rén jiā。"}, {"text": "停车坐爱枫林晚，", "pinyin": "tíng chē zuò ài fēng lín wǎn，"}, {"text": "霜叶红于二月花。", "pinyin": "shuāng yè hóng yú èr yuè huā。"}], "excerpt": "霜叶红于二月花", "weatherTag": "🍁 枫红", "theme": ["山水"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "石径蜿蜒，白云深处隐约人家，枫林如火，霜叶竟比春花更红艳。诗人以反常之喻赞美秋色，一改悲秋传统，以积极乐观的心态发现了秋天独特的美。", "img": "1507003211169-0a1dd7228f2d"}, {"id": 30, "title": "泊秦淮", "author": "杜牧", "dynasty": "唐", "season": ["秋"], "weather": ["雾", "月明"], "mood": ["忧愁"], "jieqi": ["寒露"], "lines": [{"text": "烟笼寒水月笼沙，", "pinyin": "yān lóng hán shuǐ yuè lóng shā，"}, {"text": "夜泊秦淮近酒家。", "pinyin": "yè bó qín huái jìn jiǔ jiā。"}, {"text": "商女不知亡国恨，", "pinyin": "shāng nǚ bù zhī wáng guó hèn，"}, {"text": "隔江犹唱后庭花。", "pinyin": "gé jiāng yóu chàng hòu tíng huā。"}], "excerpt": "商女不知亡国恨，隔江犹唱后庭花", "weatherTag": "🌫 烟月", "theme": ["咏史", "怀古"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "烟月笼罩下的秦淮河，歌女犹唱亡国之音，诗人借古讽今，对晚唐统治者的腐败无能发出深沉的忧虑与警告，意味深远。", "img": "1470770841072-f978cf4d019e"}, {"id": 31, "title": "寻隐者不遇", "author": "贾岛", "dynasty": "唐", "season": ["夏"], "weather": ["晴", "雾"], "mood": ["宁静", "惬意"], "jieqi": ["夏至"], "lines": [{"text": "松下问童子，", "pinyin": "sōng xià wèn tóng zǐ，"}, {"text": "言师采药去。", "pinyin": "yán shī cǎi yào qù。"}, {"text": "只在此山中，", "pinyin": "zhǐ zài cǐ shān zhōng，"}, {"text": "云深不知处。", "pinyin": "yún shēn bù zhī chù。"}], "excerpt": "只在此山中，云深不知处", "weatherTag": "☁ 云深", "theme": ["山水", "隐逸"], "form": ["五言绝句"], "lifestage": ["中年"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "寻访隐者，松下问童子，隐者入云深处采药而去。诗中问答自然，而云深不知处一句，将隐士的超然飘逸与山中的幽深神秘写得出神入化。", "img": "1448375240586-882707db888b"}, {"id": 32, "title": "悯农·其一", "author": "李绅", "dynasty": "唐", "season": ["夏"], "weather": ["晴"], "mood": ["感动", "忧愁"], "jieqi": ["芒种", "大暑"], "lines": [{"text": "锄禾日当午，", "pinyin": "chú hé rì dāng wǔ，"}, {"text": "汗滴禾下土。", "pinyin": "hàn dī hé xià tǔ。"}, {"text": "谁知盘中餐，", "pinyin": "shuí zhī pán zhōng cān，"}, {"text": "粒粒皆辛苦。", "pinyin": "lì lì jiē xīn kǔ。"}], "excerpt": "谁知盘中餐，粒粒皆辛苦", "weatherTag": "☀ 烈日", "theme": ["悯农", "田园"], "form": ["五言绝句"], "lifestage": ["童年"], "intensity": ["深沉"], "agegroup": ["小朋友", "成人"], "notes": "烈日当空，农夫挥锄耕作，汗水滴落土地。每一粒粮食都是农人辛苦的结晶，此诗以朴实的语言道出劳动之艰辛，教人珍惜粮食，感恩劳动者。", "img": "1500382017468-9049fed747ef"}, {"id": 33, "title": "江南春", "author": "杜牧", "dynasty": "唐", "season": ["春"], "weather": ["雨", "晴"], "mood": ["惬意", "忧愁"], "jieqi": ["清明", "谷雨"], "lines": [{"text": "千里莺啼绿映红，", "pinyin": "qiān lǐ yīng tí lǜ yìng hóng，"}, {"text": "水村山郭酒旗风。", "pinyin": "shuǐ cūn shān guō jiǔ qí fēng。"}, {"text": "南朝四百八十寺，", "pinyin": "nán cháo sì bǎi bā shí sì，"}, {"text": "多少楼台烟雨中。", "pinyin": "duō shǎo lóu tái yān yǔ zhōng。"}], "excerpt": "南朝四百八十寺，多少楼台烟雨中", "weatherTag": "🌧 烟雨", "theme": ["山水", "怀古"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "千里江南，莺啼绿映，酒旗飘扬，烟雨朦胧中无数楼台隐现。前两句明媚，后两句迷蒙，在美景中融入了对历史兴衰的感慨，境界深远。", "img": "1510797215324-95aa89f43c33"}, {"id": 34, "title": "如梦令", "author": "李清照", "dynasty": "宋", "season": ["夏"], "weather": ["雨", "晴"], "mood": ["惬意", "喜悦"], "jieqi": ["夏至", "小暑"], "lines": [{"text": "常记溪亭日暮，", "pinyin": "cháng jì xī tíng rì mù，"}, {"text": "沉醉不知归路。", "pinyin": "chén zuì bù zhī guī lù。"}, {"text": "兴尽晚回舟，", "pinyin": "xìng jìn wǎn huí zhōu，"}, {"text": "误入藕花深处。", "pinyin": "wù rù ǒu huā shēn chù。"}, {"text": "争渡，争渡，", "pinyin": "zhēng dù，zhēng dù，"}, {"text": "惊起一滩鸥鹭。", "pinyin": "jīng qǐ yī tān ōu lù。"}], "excerpt": "误入藕花深处，惊起一滩鸥鹭", "weatherTag": "🪷 夏晚", "theme": ["田园", "爱情"], "form": ["词·如梦令"], "lifestage": ["童年", "青春"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "词人回忆年少时游玩溪亭、醉后迷路的欢快往事。荷花、鸥鹭，清丽的意象中满是少女的天真烂漫与生活的无忧美好。", "img": "1518173946687-a4c8892bbd9f"}, {"id": 35, "title": "声声慢", "author": "李清照", "dynasty": "宋", "season": ["秋"], "weather": ["风", "雨"], "mood": ["忧愁", "思念"], "jieqi": ["霜降", "立冬"], "lines": [{"text": "寻寻觅觅，", "pinyin": "xún xún mì mì，"}, {"text": "冷冷清清，", "pinyin": "lěng lěng qīng qīng，"}, {"text": "凄凄惨惨戚戚。", "pinyin": "qī qī cǎn cǎn qī qī。"}, {"text": "乍暖还寒时候，", "pinyin": "zhà nuǎn huán hán shí hòu，"}, {"text": "最难将息。", "pinyin": "zuì nán jiāng xī。"}], "excerpt": "寻寻觅觅，冷冷清清，凄凄惨惨戚戚", "weatherTag": "🍂 秋风雨", "theme": ["相思", "羁旅"], "form": ["词·声声慢"], "lifestage": ["晚年"], "intensity": ["哀婉"], "agegroup": ["成人"], "notes": "七组叠字开篇，音调低回，情绪层层递进，将晚年李清照孤苦飘零之感表达得淋漓尽致。一字一声，皆是泪，被誉为千古绝唱。", "img": "1504701954957-2010ec3bcec1"}, {"id": 36, "title": "相见欢", "author": "李煜", "dynasty": "五代", "season": ["秋"], "weather": ["月明"], "mood": ["忧愁", "思念"], "jieqi": ["秋分", "寒露"], "lines": [{"text": "无言独上西楼，", "pinyin": "wú yán dú shàng xī lóu，"}, {"text": "月如钩。", "pinyin": "yuè rú gōu。"}, {"text": "寂寞梧桐深院锁清秋。", "pinyin": "jì mò wú tóng shēn yuàn suǒ qīng qiū。"}, {"text": "剪不断，理还乱，", "pinyin": "jiǎn bù duàn，lǐ hái luàn，"}, {"text": "是离愁。", "pinyin": "shì lí chóu。"}, {"text": "别是一般滋味在心头。", "pinyin": "bié shì yī bān zī wèi zài xīn tóu。"}], "excerpt": "剪不断，理还乱，是离愁", "weatherTag": "🌙 秋月", "theme": ["相思", "亡国"], "form": ["词·相见欢"], "lifestage": ["晚年"], "intensity": ["哀婉"], "agegroup": ["成人"], "notes": "李煜亡国后，以此词道出心中无尽愁绪。剪不断，理还乱把抽象的离愁比作丝线，形象而传神。月钩、梧桐、清秋，每一意象都是愁的载体。", "img": "1532767153582-4e89bfd43a68"}, {"id": 37, "title": "水调歌头·明月几时有", "author": "苏轼", "dynasty": "宋", "season": ["秋"], "weather": ["月明"], "mood": ["宁静", "思念"], "jieqi": ["中秋"], "lines": [{"text": "明月几时有？", "pinyin": "míng yuè jǐ shí yǒu？"}, {"text": "把酒问青天。", "pinyin": "bǎ jiǔ wèn qīng tiān。"}, {"text": "不知天上宫阙，", "pinyin": "bù zhī tiān shàng gōng què，"}, {"text": "今夕是何年。", "pinyin": "jīn xī shì hé nián。"}, {"text": "我欲乘风归去，", "pinyin": "wǒ yù chéng fēng guī qù，"}, {"text": "又恐琼楼玉宇，", "pinyin": "yòu kǒng qióng lóu yù yǔ，"}, {"text": "高处不胜寒。", "pinyin": "gāo chù bù shèng hán。"}, {"text": "但愿人长久，", "pinyin": "dàn yuàn rén cháng jiǔ，"}, {"text": "千里共婵娟。", "pinyin": "qiān lǐ gòng chán juān。"}], "excerpt": "但愿人长久，千里共婵娟", "weatherTag": "🌕 中秋月", "theme": ["节日", "哲理"], "form": ["词·水调歌头"], "lifestage": ["中年"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "苏轼中秋把酒问月，由思弟之情生发出对人生的哲思。高处不胜寒道出了超脱的代价，而但愿人长久，千里共婵娟则将个人情感升华为对天下离人的美好祝愿。", "img": "1532767153582-4e89bfd43a68"}, {"id": 38, "title": "念奴娇·赤壁怀古", "author": "苏轼", "dynasty": "宋", "season": ["秋"], "weather": ["风"], "mood": ["壮阔", "忧愁"], "jieqi": ["秋分"], "lines": [{"text": "大江东去，", "pinyin": "dà jiāng dōng qù，"}, {"text": "浪淘尽，千古风流人物。", "pinyin": "làng táo jìn，qiān gǔ fēng liú rén wù。"}, {"text": "故垒西边，", "pinyin": "gù lěi xī biān，"}, {"text": "人道是，三国周郎赤壁。", "pinyin": "rén dào shì，sān guó zhōu láng chì bì。"}, {"text": "乱石穿空，惊涛拍岸，", "pinyin": "luàn shí chuān kōng，jīng tāo pāi àn，"}, {"text": "卷起千堆雪。", "pinyin": "juǎn qǐ qiān duī xuě。"}], "excerpt": "大江东去，浪淘尽，千古风流人物", "weatherTag": "🌊 大江", "theme": ["怀古", "咏史"], "form": ["词·念奴娇"], "lifestage": ["中年"], "intensity": ["激昂"], "agegroup": ["成人"], "notes": "大江东去，千古风流，赤壁矶头，苏轼将英雄豪情与宇宙意识融于一体。浪淘历史，也淘洗个人的功名悲欢，最终归于旷达与释然，开豪放词之先河。", "img": "1506905925346-21bda4d32df4"}, {"id": 39, "title": "题西林壁", "author": "苏轼", "dynasty": "宋", "season": ["秋"], "weather": ["晴", "雾"], "mood": ["宁静", "壮阔"], "jieqi": ["寒露"], "lines": [{"text": "横看成岭侧成峰，", "pinyin": "héng kàn chéng lǐng cè chéng fēng，"}, {"text": "远近高低各不同。", "pinyin": "yuǎn jìn gāo dī gè bù tóng。"}, {"text": "不识庐山真面目，", "pinyin": "bù shí lú shān zhēn miàn mù，"}, {"text": "只缘身在此山中。", "pinyin": "zhǐ yuán shēn zài cǐ shān zhōng。"}], "excerpt": "不识庐山真面目，只缘身在此山中", "weatherTag": "⛰ 山雾", "theme": ["山水", "哲理"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "游庐山有感而发，由景入理。观山角度不同，所见形状各异；人在山中，反而看不清庐山全貌。以此比喻人们对事物的认识往往受限于所处位置与视角，哲理深刻。", "img": "1513836279014-a89f7a76ae86"}, {"id": 40, "title": "饮湖上初晴后雨", "author": "苏轼", "dynasty": "宋", "season": ["春", "夏"], "weather": ["晴", "雨"], "mood": ["喜悦", "惬意"], "jieqi": ["谷雨", "小满"], "lines": [{"text": "水光潋滟晴方好，", "pinyin": "shuǐ guāng liàn yàn qíng fāng hǎo，"}, {"text": "山色空蒙雨亦奇。", "pinyin": "shān sè kōng méng yǔ yì qí。"}, {"text": "欲把西湖比西子，", "pinyin": "yù bǎ xī hú bǐ xī zǐ，"}, {"text": "淡妆浓抹总相宜。", "pinyin": "dàn zhuāng nóng mǒ zǒng xiāng yí。"}], "excerpt": "欲把西湖比西子，淡妆浓抹总相宜", "weatherTag": "🌦 晴雨", "theme": ["山水", "田园"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "西湖晴天水光潋滟，雨天山色空蒙，各有其美。苏轼以西施比西湖，淡妆浓抹皆相宜，一语道尽西湖无论何种天气都美不胜收的神韵，此比喻沿用至今。", "img": "1507003211169-0a1dd7228f2d"}, {"id": 41, "title": "春日", "author": "朱熹", "dynasty": "宋", "season": ["春"], "weather": ["晴"], "mood": ["喜悦", "壮阔"], "jieqi": ["春分", "清明"], "lines": [{"text": "胜日寻芳泗水滨，", "pinyin": "shèng rì xún fāng sì shuǐ bīn，"}, {"text": "无边光景一时新。", "pinyin": "wú biān guāng jǐng yī shí xīn。"}, {"text": "等闲识得东风面，", "pinyin": "děng xián shí dé dōng fēng miàn，"}, {"text": "万紫千红总是春。", "pinyin": "wàn zǐ qiān hóng zǒng shì chūn。"}], "excerpt": "万紫千红总是春", "weatherTag": "🌈 春光", "theme": ["哲理", "田园"], "form": ["七言绝句"], "lifestage": ["青春", "中年"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "表面写春游泗水之滨，万紫千红，生机勃勃，实则暗喻求学问道，如沐春风，一旦领悟，则处处皆是新气象。是一首寓意深刻的哲理诗。", "img": "1516912481800-cf00b3a15083"}, {"id": 42, "title": "晓出净慈寺送林子方", "author": "杨万里", "dynasty": "宋", "season": ["夏"], "weather": ["晴"], "mood": ["喜悦", "感动"], "jieqi": ["夏至", "小暑"], "lines": [{"text": "毕竟西湖六月中，", "pinyin": "bì jìng xī hú liù yuè zhōng，"}, {"text": "风光不与四时同。", "pinyin": "fēng guāng bù yǔ sì shí tóng。"}, {"text": "接天莲叶无穷碧，", "pinyin": "jiē tiān lián yè wú qióng bì，"}, {"text": "映日荷花别样红。", "pinyin": "yìng rì hé huā bié yàng hóng。"}], "excerpt": "接天莲叶无穷碧，映日荷花别样红", "weatherTag": "🌸 荷夏", "theme": ["山水", "田园"], "form": ["七言绝句"], "lifestage": ["青春"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "六月西湖，莲叶接天，荷花映日，别有一番壮观之美。诗人以开阔的视野、饱满的色彩，将盛夏西湖的荷花之美写到了极致，令人心旷神怡。", "img": "1518173946687-a4c8892bbd9f"}, {"id": 43, "title": "小池", "author": "杨万里", "dynasty": "宋", "season": ["夏"], "weather": ["晴"], "mood": ["惬意", "喜悦"], "jieqi": ["小满", "芒种"], "lines": [{"text": "泉眼无声惜细流，", "pinyin": "quán yǎn wú shēng xī xì liú，"}, {"text": "树阴照水爱晴柔。", "pinyin": "shù yīn zhào shuǐ ài qíng róu。"}, {"text": "小荷才露尖尖角，", "pinyin": "xiǎo hé cái lù jiān jiān jiǎo，"}, {"text": "早有蜻蜓立上头。", "pinyin": "zǎo yǒu qīng tíng lì shàng tóu。"}], "excerpt": "小荷才露尖尖角，早有蜻蜓立上头", "weatherTag": "🌿 初夏", "theme": ["田园", "山水"], "form": ["七言绝句"], "lifestage": ["童年", "青春"], "intensity": ["轻盈"], "agegroup": ["小朋友", "成人"], "notes": "泉眼、树阴、小荷、蜻蜓，四个细小的意象构成一幅精致的初夏画卷。小荷才露角，蜻蜓已立其上，以动写静，充满了生命的灵气与童趣。", "img": "1465146344425-f00d5f5c8f07"}, {"id": 44, "title": "约客", "author": "赵师秀", "dynasty": "宋", "season": ["夏"], "weather": ["雨"], "mood": ["宁静", "孤独"], "jieqi": ["芒种", "小暑"], "lines": [{"text": "黄梅时节家家雨，", "pinyin": "huáng méi shí jié jiā jiā yǔ，"}, {"text": "青草池塘处处蛙。", "pinyin": "qīng cǎo chí táng chù chù wā。"}, {"text": "有约不来过夜半，", "pinyin": "yǒu yuē bù lái guò yè bàn，"}, {"text": "闲敲棋子落灯花。", "pinyin": "xián qiāo qí zǐ luò dēng huā。"}], "excerpt": "闲敲棋子落灯花", "weatherTag": "🌧 黄梅雨", "theme": ["田园", "友情"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["轻盈"], "agegroup": ["成人"], "notes": "梅雨季节，蛙声阵阵，夜已过半，约好的客人还未到来。诗人百无聊赖地敲着棋子，灯花悄然落下，以动写静，将等待的寂寥与惆怅刻画得入木三分。", "img": "1508739773434-c26b3d09e071"}, {"id": 45, "title": "示儿", "author": "陆游", "dynasty": "宋", "season": ["冬"], "weather": ["晴"], "mood": ["壮阔", "感动"], "jieqi": ["冬至"], "lines": [{"text": "死去元知万事空，", "pinyin": "sǐ qù yuán zhī wàn shì kōng，"}, {"text": "但悲不见九州同。", "pinyin": "dàn bēi bú jiàn jiǔ zhōu tóng。"}, {"text": "王师北定中原日，", "pinyin": "wáng shī běi dìng zhōng yuán rì，"}, {"text": "家祭无忘告乃翁。", "pinyin": "jiā jì wú wàng gào nǎi wēng。"}], "excerpt": "王师北定中原日，家祭无忘告乃翁", "weatherTag": "❤ 赤诚", "theme": ["忧国", "亲情"], "form": ["七言绝句"], "lifestage": ["晚年"], "intensity": ["激昂"], "agegroup": ["成人"], "notes": "陆游临终遗嘱。死去万事皆空，唯一放不下的是未能见到祖国统一。叮嘱儿孙：收复中原之日，祭祀时莫忘告知老父。爱国之情，至死不渝，令人动容。", "img": "1474552226712-ac0f0961a954"}, {"id": 46, "title": "秋夜将晓出篱门迎凉有感", "author": "陆游", "dynasty": "宋", "season": ["秋"], "weather": ["晴"], "mood": ["忧愁", "壮阔"], "jieqi": ["霜降"], "lines": [{"text": "三万里河东入海，", "pinyin": "sān wàn lǐ hé dōng rù hǎi，"}, {"text": "五千仞岳上摩天。", "pinyin": "wǔ qiān rèn yuè shàng mó tiān。"}, {"text": "遗民泪尽胡尘里，", "pinyin": "yí mín lèi jìn hú chén lǐ，"}, {"text": "南望王师又一年。", "pinyin": "nán wàng wáng shī yòu yī nián。"}], "excerpt": "遗民泪尽胡尘里，南望王师又一年", "weatherTag": "🍂 秋望", "theme": ["忧国"], "form": ["七言绝句"], "lifestage": ["晚年"], "intensity": ["激昂"], "agegroup": ["成人"], "notes": "黄河东流入海，泰山高耸入云，祖国河山依然壮阔，而沦陷区的百姓泪已流尽，年复一年南望救兵而不至。诗人以自然的壮丽反衬人民的苦难，爱国之痛入骨三分。", "img": "1464822759023-fed622ff2c3b"}, {"id": 47, "title": "题临安邸", "author": "林升", "dynasty": "宋", "season": ["夏"], "weather": ["晴"], "mood": ["忧愁"], "jieqi": ["夏至"], "lines": [{"text": "山外青山楼外楼，", "pinyin": "shān wài qīng shān lóu wài lóu，"}, {"text": "西湖歌舞几时休。", "pinyin": "xī hú gē wǔ jǐ shí xiū。"}, {"text": "暖风熏得游人醉，", "pinyin": "nuǎn fēng xūn dé yóu rén zuì，"}, {"text": "直把杭州作汴州。", "pinyin": "zhí bǎ háng zhōu zuò biàn zhōu。"}], "excerpt": "暖风熏得游人醉，直把杭州作汴州", "weatherTag": "🌸 暖风", "theme": ["忧国", "咏史"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "南宋偏安杭州，统治者沉湎于歌舞享乐，忘却了沦陷的故都汴州。诗人以辛辣的笔触讽刺当权者，暖风醉人，却是亡国的温柔之乡。", "img": "1558618666-fcd25c85cd64"}, {"id": 48, "title": "己亥杂诗", "author": "龚自珍", "dynasty": "清", "season": ["春"], "weather": ["晴"], "mood": ["壮阔", "感动"], "jieqi": ["春分"], "lines": [{"text": "浩荡离愁白日斜，", "pinyin": "hào dàng lí chóu bái rì xié，"}, {"text": "吟鞭东指即天涯。", "pinyin": "yín biān dōng zhǐ jí tiān yá。"}, {"text": "落红不是无情物，", "pinyin": "luò hóng bù shì wú qíng wù，"}, {"text": "化作春泥更护花。", "pinyin": "huà zuò chūn ní gèng hù huā。"}], "excerpt": "落红不是无情物，化作春泥更护花", "weatherTag": "🌸 春泥", "theme": ["隐逸", "哲理"], "form": ["七言绝句"], "lifestage": ["中年"], "intensity": ["深沉"], "agegroup": ["成人"], "notes": "诗人辞官离京，夕阳斜照，离愁浩荡。落花并非无情，化为春泥仍护育新花。以此自比，表达了虽身离庙堂，仍愿为国效力、培育后人的高尚情操。", "img": "1516912481800-cf00b3a15083"}, {"id": 49, "title": "卜算子·咏梅", "author": "陆游", "dynasty": "宋", "season": ["冬", "春"], "weather": ["雪", "风"], "mood": ["宁静", "孤独"], "jieqi": ["小寒", "大寒", "立春"], "lines": [{"text": "驿外断桥边，", "pinyin": "yì wài duàn qiáo biān，"}, {"text": "寂寞开无主。", "pinyin": "jì mò kāi wú zhǔ。"}, {"text": "已是黄昏独自愁，", "pinyin": "yǐ shì huáng hūn dú zì chóu，"}, {"text": "更著风和雨。", "pinyin": "gèng zhe fēng hé yǔ。"}, {"text": "无意苦争春，", "pinyin": "wú yì kǔ zhēng chūn，"}, {"text": "一任群芳妒。", "pinyin": "yī rèn qún fāng dù。"}, {"text": "零落成泥碾作尘，", "pinyin": "líng luò chéng ní niǎn zuò chén，"}, {"text": "只有香如故。", "pinyin": "zhǐ yǒu xiāng rú gù。"}], "excerpt": "零落成泥碾作尘，只有香如故", "weatherTag": "❄ 寒梅", "theme": ["咏物", "隐逸"], "form": ["词·卜算子"], "lifestage": ["晚年"], "intensity": ["哀婉"], "agegroup": ["成人"], "notes": "陆游以梅自喻，孤独绽放于断桥荒野，历经风雨，宁可零落成尘，也要保持芳香如故。这是诗人一生坚守理想、不随波逐流的精神写照，意境悲而不衰。", "img": "1491002052546-bf38f186af56"}, {"id": 50, "title": "虞美人", "author": "李煜", "dynasty": "五代", "season": ["春"], "weather": ["月明"], "mood": ["忧愁", "思念"], "jieqi": ["春分"], "lines": [{"text": "春花秋月何时了？", "pinyin": "chūn huā qiū yuè hé shí liǎo？"}, {"text": "往事知多少。", "pinyin": "wǎng shì zhī duō shǎo。"}, {"text": "小楼昨夜又东风，", "pinyin": "xiǎo lóu zuó yè yòu dōng fēng，"}, {"text": "故国不堪回首月明中。", "pinyin": "gù guó bù kān huí shǒu yuè míng zhōng。"}, {"text": "雕栏玉砌应犹在，", "pinyin": "diāo lán yù qì yīng yóu zài，"}, {"text": "只是朱颜改。", "pinyin": "zhǐ shì zhū yán gǎi。"}, {"text": "问君能有几多愁？", "pinyin": "wèn jūn néng yǒu jǐ duō chóu？"}, {"text": "恰似一江春水向东流。", "pinyin": "qià sì yī jiāng chūn shuǐ xiàng dōng liú。"}], "excerpt": "问君能有几多愁？恰似一江春水向东流", "weatherTag": "🌸 春月", "theme": ["相思", "亡国"], "form": ["词·虞美人"], "lifestage": ["晚年"], "intensity": ["哀婉"], "agegroup": ["成人"], "notes": "李煜亡国后的绝命词。春花秋月年年有，往事却不堪回首。故国已亡，雕栏玉砌依旧，只是朱颜已改。愁如一江春水，滔滔东流，无穷无尽，令人读之潸然泪下。", "img": "1532767153582-4e89bfd43a68"}];
+var QUESTIONS = [{"id": 1, "poemId": 1, "type": "fill", "title": "春晓", "author": "孟浩然", "question": "春眠＿觉晓，", "hint": "《春晓》孟浩然", "answer": "不", "fullLine": "春眠不觉晓，", "xubi": 5, "options": ["梅", "六", "不", "萄"]}, {"id": 2, "poemId": 1, "type": "next", "title": "春晓", "author": "孟浩然", "question": "春眠不觉晓，", "hint": "《春晓》下一句是？", "answer": "处处闻啼鸟。", "xubi": 8, "options": ["浪淘尽，千古风流人物。", "等闲识得东风面，", "随意春芳歇，", "处处闻啼鸟。"]}, {"id": 3, "poemId": 1, "type": "author", "title": "春晓", "author": "孟浩然", "question": "《春晓》的作者是？", "hint": "唐代诗人", "answer": "孟浩然", "excerpt": "春眠不觉晓，处处闻啼鸟", "xubi": 6, "options": ["陆游", "崔护", "孟浩然", "朱熹"]}, {"id": 4, "poemId": 2, "type": "fill", "title": "静夜思", "author": "李白", "question": "床前＿月光，", "hint": "《静夜思》李白", "answer": "明", "fullLine": "床前明月光，", "xubi": 5, "options": ["眠", "直", "明", "禾"]}, {"id": 5, "poemId": 2, "type": "next", "title": "静夜思", "author": "李白", "question": "床前明月光，", "hint": "《静夜思》下一句是？", "answer": "疑是地上霜。", "xubi": 8, "options": ["恨别鸟惊心。", "争渡，争渡，", "五千仞岳上摩天。", "疑是地上霜。"]}, {"id": 6, "poemId": 2, "type": "author", "title": "静夜思", "author": "李白", "question": "《静夜思》的作者是？", "hint": "唐代诗人", "answer": "李白", "excerpt": "举头望明月，低头思故乡", "xubi": 6, "options": ["林升", "李白", "孟郊", "贺知章"]}, {"id": 7, "poemId": 3, "type": "fill", "title": "枫桥夜泊", "author": "张继", "question": "月落乌＿霜满天，", "hint": "《枫桥夜泊》张继", "answer": "啼", "fullLine": "月落乌啼霜满天，", "xubi": 5, "options": ["啼", "眦", "似", "堆"]}, {"id": 8, "poemId": 3, "type": "next", "title": "枫桥夜泊", "author": "张继", "question": "月落乌啼霜满天，", "hint": "《枫桥夜泊》下一句是？", "answer": "江枫渔火对愁眠。", "xubi": 8, "options": ["三万里河东入海，", "江枫渔火对愁眠。", "二月春风似剪刀。", "胜日寻芳泗水滨，"]}, {"id": 9, "poemId": 3, "type": "author", "title": "枫桥夜泊", "author": "张继", "question": "《枫桥夜泊》的作者是？", "hint": "唐代诗人", "answer": "张继", "excerpt": "月落乌啼霜满天，江枫渔火对愁眠", "xubi": 6, "options": ["张继", "杨万里", "杜甫", "朱熹"]}, {"id": 10, "poemId": 4, "type": "fill", "title": "咏柳", "author": "贺知章", "question": "碧玉妆＿一树高，", "hint": "《咏柳》贺知章", "answer": "成", "fullLine": "碧玉妆成一树高，", "xubi": 5, "options": ["开", "将", "条", "成"]}, {"id": 11, "poemId": 4, "type": "next", "title": "咏柳", "author": "贺知章", "question": "碧玉妆成一树高，", "hint": "《咏柳》下一句是？", "answer": "万条垂下绿丝绦。", "xubi": 8, "options": ["白头搔更短，", "空山新雨后，", "万条垂下绿丝绦。", "早有蜻蜓立上头。"]}, {"id": 12, "poemId": 4, "type": "author", "title": "咏柳", "author": "贺知章", "question": "《咏柳》的作者是？", "hint": "唐代诗人", "answer": "贺知章", "excerpt": "不知细叶谁裁出，二月春风似剪刀", "xubi": 6, "options": ["李煜", "林升", "贺知章", "杜牧"]}, {"id": 13, "poemId": 5, "type": "fill", "title": "望庐山瀑布", "author": "李白", "question": "日照香＿生紫烟，", "hint": "《望庐山瀑布》李白", "answer": "炉", "fullLine": "日照香炉生紫烟，", "xubi": 5, "options": ["枝", "岱", "折", "炉"]}, {"id": 14, "poemId": 5, "type": "next", "title": "望庐山瀑布", "author": "李白", "question": "日照香炉生紫烟，", "hint": "《望庐山瀑布》下一句是？", "answer": "遥看瀑布挂前川。", "xubi": 8, "options": ["遥看瀑布挂前川。", "胜日寻芳泗水滨，", "无边落木萧萧下，", "只在此山中，"]}, {"id": 15, "poemId": 5, "type": "author", "title": "望庐山瀑布", "author": "李白", "question": "《望庐山瀑布》的作者是？", "hint": "唐代诗人", "answer": "李白", "excerpt": "飞流直下三千尺，疑是银河落九天", "xubi": 6, "options": ["李白", "王维", "龚自珍", "林升"]}, {"id": 16, "poemId": 6, "type": "fill", "title": "夜雪", "author": "白居易", "question": "已讶＿枕冷，", "hint": "《夜雪》白居易", "answer": "衾", "fullLine": "已讶衾枕冷，", "xubi": 5, "options": ["衾", "雨", "燕", "苔"]}, {"id": 17, "poemId": 6, "type": "next", "title": "夜雪", "author": "白居易", "question": "已讶衾枕冷，", "hint": "《夜雪》下一句是？", "answer": "复见窗户明。", "xubi": 8, "options": ["恰似一江春水向东流。", "日照香炉生紫烟，", "复见窗户明。", "两岸猿声啼不住，"]}, {"id": 18, "poemId": 6, "type": "author", "title": "夜雪", "author": "白居易", "question": "《夜雪》的作者是？", "hint": "唐代诗人", "answer": "白居易", "excerpt": "夜深知雪重，时闻折竹声", "xubi": 6, "options": ["龚自珍", "白居易", "李清照", "王昌龄"]}, {"id": 19, "poemId": 7, "type": "fill", "title": "山居秋暝", "author": "王维", "question": "空山＿雨后，", "hint": "《山居秋暝》王维", "answer": "新", "fullLine": "空山新雨后，", "xubi": 5, "options": ["新", "泊", "间", "直"]}, {"id": 20, "poemId": 7, "type": "next", "title": "山居秋暝", "author": "王维", "question": "空山新雨后，", "hint": "《山居秋暝》下一句是？", "answer": "天气晚来秋。", "xubi": 8, "options": ["恰似一江春水向东流。", "春潮带雨晚来急，", "天气晚来秋。", "冷冷清清，"]}, {"id": 21, "poemId": 7, "type": "author", "title": "山居秋暝", "author": "王维", "question": "《山居秋暝》的作者是？", "hint": "唐代诗人", "answer": "王维", "excerpt": "明月松间照，清泉石上流", "xubi": 6, "options": ["贾岛", "杜牧", "朱熹", "王维"]}, {"id": 22, "poemId": 8, "type": "fill", "title": "赠汪伦", "author": "李白", "question": "李白乘＿将欲行，", "hint": "《赠汪伦》李白", "answer": "舟", "fullLine": "李白乘舟将欲行，", "xubi": 5, "options": ["白", "清", "对", "舟"]}, {"id": 23, "poemId": 8, "type": "next", "title": "赠汪伦", "author": "李白", "question": "李白乘舟将欲行，", "hint": "《赠汪伦》下一句是？", "answer": "忽闻岸上踏歌声。", "xubi": 8, "options": ["寻寻觅觅，", "忽闻岸上踏歌声。", "言师采药去。", "意恐迟迟归。"]}, {"id": 24, "poemId": 8, "type": "author", "title": "赠汪伦", "author": "李白", "question": "《赠汪伦》的作者是？", "hint": "唐代诗人", "answer": "李白", "excerpt": "桃花潭水深千尺，不及汪伦送我情", "xubi": 6, "options": ["李白", "李煜", "陆游", "李绅"]}, {"id": 25, "poemId": 9, "type": "fill", "title": "江雪", "author": "柳宗元", "question": "千山＿飞绝，", "hint": "《江雪》柳宗元", "answer": "鸟", "fullLine": "千山鸟飞绝，", "xubi": 5, "options": ["潋", "鸟", "临", "萄"]}, {"id": 26, "poemId": 9, "type": "next", "title": "江雪", "author": "柳宗元", "question": "千山鸟飞绝，", "hint": "《江雪》下一句是？", "answer": "万径人踪灭。", "xubi": 8, "options": ["潦倒新停浊酒杯。", "万径人踪灭。", "零落成泥碾作尘，", "欲把西湖比西子，"]}, {"id": 27, "poemId": 9, "type": "author", "title": "江雪", "author": "柳宗元", "question": "《江雪》的作者是？", "hint": "唐代诗人", "answer": "柳宗元", "excerpt": "孤舟蓑笠翁，独钓寒江雪", "xubi": 6, "options": ["韦应物", "贾岛", "柳宗元", "李煜"]}, {"id": 28, "poemId": 10, "type": "fill", "title": "登鹳雀楼", "author": "王之涣", "question": "白日＿山尽，", "hint": "《登鹳雀楼》王之涣", "answer": "依", "fullLine": "白日依山尽，", "xubi": 5, "options": ["插", "水", "子", "依"]}, {"id": 29, "poemId": 10, "type": "next", "title": "登鹳雀楼", "author": "王之涣", "question": "白日依山尽，", "hint": "《登鹳雀楼》下一句是？", "answer": "黄河入海流。", "xubi": 8, "options": ["竹喧归浣女，", "黄河入海流。", "牧童遥指杏花村。", "床前明月光，"]}, {"id": 30, "poemId": 10, "type": "author", "title": "登鹳雀楼", "author": "王之涣", "question": "《登鹳雀楼》的作者是？", "hint": "唐代诗人", "answer": "王之涣", "excerpt": "欲穷千里目，更上一层楼", "xubi": 6, "options": ["王翰", "崔护", "杜甫", "王之涣"]}, {"id": 31, "poemId": 11, "type": "fill", "title": "凉州词", "author": "王翰", "question": "葡萄美＿夜光杯，", "hint": "《凉州词》王翰", "answer": "酒", "fullLine": "葡萄美酒夜光杯，", "xubi": 5, "options": ["酒", "童", "是", "作"]}, {"id": 32, "poemId": 11, "type": "next", "title": "凉州词", "author": "王翰", "question": "葡萄美酒夜光杯，", "hint": "《凉州词》下一句是？", "answer": "欲饮琵琶马上催。", "xubi": 8, "options": ["谁知盘中餐，", "欲穷千里目，", "欲饮琵琶马上催。", "潦倒新停浊酒杯。"]}, {"id": 33, "poemId": 11, "type": "author", "title": "凉州词", "author": "王翰", "question": "《凉州词》的作者是？", "hint": "唐代诗人", "answer": "王翰", "excerpt": "醉卧沙场君莫笑，古来征战几人回", "xubi": 6, "options": ["王翰", "杨万里", "王维", "贺知章"]}, {"id": 34, "poemId": 12, "type": "fill", "title": "出塞", "author": "王昌龄", "question": "秦时明＿汉时关，", "hint": "《出塞》王昌龄", "answer": "月", "fullLine": "秦时明月汉时关，", "xubi": 5, "options": ["汴", "寞", "窗", "月"]}, {"id": 35, "poemId": 12, "type": "next", "title": "出塞", "author": "王昌龄", "question": "秦时明月汉时关，", "hint": "《出塞》下一句是？", "answer": "万里长征人未还。", "xubi": 8, "options": ["孤帆远影碧空尽，", "粒粒皆辛苦。", "万里长征人未还。", "争渡，争渡，"]}, {"id": 36, "poemId": 12, "type": "author", "title": "出塞", "author": "王昌龄", "question": "《出塞》的作者是？", "hint": "唐代诗人", "answer": "王昌龄", "excerpt": "秦时明月汉时关，万里长征人未还", "xubi": 6, "options": ["崔护", "李煜", "王昌龄", "王维"]}, {"id": 37, "poemId": 13, "type": "fill", "title": "望天门山", "author": "李白", "question": "天门中＿楚江开，", "hint": "《望天门山》李白", "answer": "断", "fullLine": "天门中断楚江开，", "xubi": 5, "options": ["断", "敲", "雀", "赤"]}, {"id": 38, "poemId": 13, "type": "next", "title": "望天门山", "author": "李白", "question": "天门中断楚江开，", "hint": "《望天门山》下一句是？", "answer": "碧水东流至此回。", "xubi": 8, "options": ["锄禾日当午，", "两岸猿声啼不住，", "碧水东流至此回。", "忽闻岸上踏歌声。"]}, {"id": 39, "poemId": 13, "type": "author", "title": "望天门山", "author": "李白", "question": "《望天门山》的作者是？", "hint": "唐代诗人", "answer": "李白", "excerpt": "两岸青山相对出，孤帆一片日边来", "xubi": 6, "options": ["杨万里", "王之涣", "苏轼", "李白"]}, {"id": 40, "poemId": 14, "type": "fill", "title": "早发白帝城", "author": "李白", "question": "朝辞白＿彩云间，", "hint": "《早发白帝城》李白", "answer": "帝", "fullLine": "朝辞白帝彩云间，", "xubi": 5, "options": ["山", "帝", "清", "辞"]}, {"id": 41, "poemId": 14, "type": "next", "title": "早发白帝城", "author": "李白", "question": "朝辞白帝彩云间，", "hint": "《早发白帝城》下一句是？", "answer": "千里江陵一日还。", "xubi": 8, "options": ["我欲乘风归去，", "大江东去，", "不知天上宫阙，", "千里江陵一日还。"]}, {"id": 42, "poemId": 14, "type": "author", "title": "早发白帝城", "author": "李白", "question": "《早发白帝城》的作者是？", "hint": "唐代诗人", "answer": "李白", "excerpt": "轻舟已过万重山", "xubi": 6, "options": ["李绅", "贺知章", "王之涣", "李白"]}, {"id": 43, "poemId": 15, "type": "fill", "title": "黄鹤楼送孟浩然之广陵", "author": "李白", "question": "故人西＿黄鹤楼，", "hint": "《黄鹤楼送孟浩然之广陵》李白", "answer": "辞", "fullLine": "故人西辞黄鹤楼，", "xubi": 5, "options": ["刀", "辞", "来", "野"]}, {"id": 44, "poemId": 15, "type": "next", "title": "黄鹤楼送孟浩然之广陵", "author": "李白", "question": "故人西辞黄鹤楼，", "hint": "《黄鹤楼送孟浩然之广陵》下一句是？", "answer": "烟花三月下扬州。", "xubi": 8, "options": ["临行密密缝，", "不尽长江滚滚来。", "恨别鸟惊心。", "烟花三月下扬州。"]}, {"id": 45, "poemId": 15, "type": "author", "title": "黄鹤楼送孟浩然之广陵", "author": "李白", "question": "《黄鹤楼送孟浩然之广陵》的作者是？", "hint": "唐代诗人", "answer": "李白", "excerpt": "烟花三月下扬州", "xubi": 6, "options": ["崔护", "龚自珍", "柳宗元", "李白"]}, {"id": 46, "poemId": 16, "type": "fill", "title": "登高", "author": "杜甫", "question": "风急天＿猿啸哀，", "hint": "《登高》杜甫", "answer": "高", "fullLine": "风急天高猿啸哀，", "xubi": 5, "options": ["撷", "忘", "高", "浑"]}, {"id": 47, "poemId": 16, "type": "next", "title": "登高", "author": "杜甫", "question": "风急天高猿啸哀，", "hint": "《登高》下一句是？", "answer": "渚清沙白鸟飞回。", "xubi": 8, "options": ["客舍青青柳色新。", "欲穷千里目，", "二月春风似剪刀。", "渚清沙白鸟飞回。"]}, {"id": 48, "poemId": 16, "type": "author", "title": "登高", "author": "杜甫", "question": "《登高》的作者是？", "hint": "唐代诗人", "answer": "杜甫", "excerpt": "无边落木萧萧下，不尽长江滚滚来", "xubi": 6, "options": ["杜甫", "王之涣", "李清照", "韦应物"]}, {"id": 49, "poemId": 17, "type": "fill", "title": "春望", "author": "杜甫", "question": "国破＿河在，", "hint": "《春望》杜甫", "answer": "山", "fullLine": "国破山河在，", "xubi": 5, "options": ["车", "野", "山", "滚"]}, {"id": 50, "poemId": 17, "type": "next", "title": "春望", "author": "杜甫", "question": "国破山河在，", "hint": "《春望》下一句是？", "answer": "城春草木深。", "xubi": 8, "options": ["不知细叶谁裁出，", "树阴照水爱晴柔。", "荡胸生曾云，", "城春草木深。"]}, {"id": 51, "poemId": 17, "type": "author", "title": "春望", "author": "杜甫", "question": "《春望》的作者是？", "hint": "唐代诗人", "answer": "杜甫", "excerpt": "烽火连三月，家书抵万金", "xubi": 6, "options": ["贾岛", "赵师秀", "崔护", "杜甫"]}, {"id": 52, "poemId": 18, "type": "fill", "title": "绝句", "author": "杜甫", "question": "两个黄＿鸣翠柳，", "hint": "《绝句》杜甫", "answer": "鹂", "fullLine": "两个黄鹂鸣翠柳，", "xubi": 5, "options": ["碾", "作", "鹂", "苏"]}, {"id": 53, "poemId": 18, "type": "next", "title": "绝句", "author": "杜甫", "question": "两个黄鹂鸣翠柳，", "hint": "《绝句》下一句是？", "answer": "一行白鹭上青天。", "xubi": 8, "options": ["姑苏城外寒山寺，", "寻寻觅觅，", "兴尽晚回舟，", "一行白鹭上青天。"]}, {"id": 54, "poemId": 18, "type": "author", "title": "绝句", "author": "杜甫", "question": "《绝句》的作者是？", "hint": "唐代诗人", "answer": "杜甫", "excerpt": "两个黄鹂鸣翠柳，一行白鹭上青天", "xubi": 6, "options": ["李白", "林升", "杜甫", "苏轼"]}, {"id": 55, "poemId": 19, "type": "fill", "title": "望岳", "author": "杜甫", "question": "岱宗＿如何？", "hint": "《望岳》杜甫", "answer": "夫", "fullLine": "岱宗夫如何？", "xubi": 5, "options": ["群", "夫", "祭", "立"]}, {"id": 56, "poemId": 19, "type": "next", "title": "望岳", "author": "杜甫", "question": "岱宗夫如何？", "hint": "《望岳》下一句是？", "answer": "齐鲁青未了。", "xubi": 8, "options": ["夜来风雨声，", "报得三春晖。", "明月几时有？", "齐鲁青未了。"]}, {"id": 57, "poemId": 19, "type": "author", "title": "望岳", "author": "杜甫", "question": "《望岳》的作者是？", "hint": "唐代诗人", "answer": "杜甫", "excerpt": "会当凌绝顶，一览众山小", "xubi": 6, "options": ["贾岛", "孟郊", "杜甫", "林升"]}, {"id": 58, "poemId": 20, "type": "fill", "title": "相思", "author": "王维", "question": "红豆＿南国，", "hint": "《相思》王维", "answer": "生", "fullLine": "红豆生南国，", "xubi": 5, "options": ["生", "色", "寸", "真"]}, {"id": 59, "poemId": 20, "type": "next", "title": "相思", "author": "王维", "question": "红豆生南国，", "hint": "《相思》下一句是？", "answer": "春来发几枝。", "xubi": 8, "options": ["我欲乘风归去，", "最难将息。", "三万里河东入海，", "春来发几枝。"]}, {"id": 60, "poemId": 20, "type": "author", "title": "相思", "author": "王维", "question": "《相思》的作者是？", "hint": "唐代诗人", "answer": "王维", "excerpt": "红豆生南国，春来发几枝", "xubi": 6, "options": ["李煜", "孟郊", "王维", "陆游"]}, {"id": 61, "poemId": 21, "type": "fill", "title": "九月九日忆山东兄弟", "author": "王维", "question": "独在异＿为异客，", "hint": "《九月九日忆山东兄弟》王维", "answer": "乡", "fullLine": "独在异乡为异客，", "xubi": 5, "options": ["才", "乡", "同", "塘"]}, {"id": 62, "poemId": 21, "type": "next", "title": "九月九日忆山东兄弟", "author": "王维", "question": "独在异乡为异客，", "hint": "《九月九日忆山东兄弟》下一句是？", "answer": "每逢佳节倍思亲。", "xubi": 8, "options": ["每逢佳节倍思亲。", "山色空蒙雨亦奇。", "天门中断楚江开，", "阴阳割昏晓。"]}, {"id": 63, "poemId": 21, "type": "author", "title": "九月九日忆山东兄弟", "author": "王维", "question": "《九月九日忆山东兄弟》的作者是？", "hint": "唐代诗人", "answer": "王维", "excerpt": "独在异乡为异客，每逢佳节倍思亲", "xubi": 6, "options": ["崔护", "王维", "林升", "朱熹"]}, {"id": 64, "poemId": 22, "type": "fill", "title": "鹿柴", "author": "王维", "question": "空山＿见人，", "hint": "《鹿柴》王维", "answer": "不", "fullLine": "空山不见人，", "xubi": 5, "options": ["涯", "方", "不", "逢"]}, {"id": 65, "poemId": 22, "type": "next", "title": "鹿柴", "author": "王维", "question": "空山不见人，", "hint": "《鹿柴》下一句是？", "answer": "但闻人语响。", "xubi": 8, "options": ["粒粒皆辛苦。", "不识庐山真面目，", "乌衣巷口夕阳斜。", "但闻人语响。"]}, {"id": 66, "poemId": 22, "type": "author", "title": "鹿柴", "author": "王维", "question": "《鹿柴》的作者是？", "hint": "唐代诗人", "answer": "王维", "excerpt": "空山不见人，但闻人语响", "xubi": 6, "options": ["孟郊", "柳宗元", "李白", "王维"]}, {"id": 67, "poemId": 23, "type": "fill", "title": "送元二使安西", "author": "王维", "question": "渭城朝＿浥轻尘，", "hint": "《送元二使安西》王维", "answer": "雨", "fullLine": "渭城朝雨浥轻尘，", "xubi": 5, "options": ["桥", "雨", "商", "莺"]}, {"id": 68, "poemId": 23, "type": "next", "title": "送元二使安西", "author": "王维", "question": "渭城朝雨浥轻尘，", "hint": "《送元二使安西》下一句是？", "answer": "客舍青青柳色新。", "xubi": 8, "options": ["碧水东流至此回。", "客舍青青柳色新。", "一览众山小。", "雕栏玉砌应犹在，"]}, {"id": 69, "poemId": 23, "type": "author", "title": "送元二使安西", "author": "王维", "question": "《送元二使安西》的作者是？", "hint": "唐代诗人", "answer": "王维", "excerpt": "劝君更尽一杯酒，西出阳关无故人", "xubi": 6, "options": ["张继", "王维", "白居易", "柳宗元"]}, {"id": 70, "poemId": 24, "type": "fill", "title": "滁州西涧", "author": "韦应物", "question": "独怜幽＿涧边生，", "hint": "《滁州西涧》韦应物", "answer": "草", "fullLine": "独怜幽草涧边生，", "xubi": 5, "options": ["神", "照", "草", "今"]}, {"id": 71, "poemId": 24, "type": "next", "title": "滁州西涧", "author": "韦应物", "question": "独怜幽草涧边生，", "hint": "《滁州西涧》下一句是？", "answer": "上有黄鹂深树鸣。", "xubi": 8, "options": ["等闲识得东风面，", "上有黄鹂深树鸣。", "齐鲁青未了。", "有约不来过夜半，"]}, {"id": 72, "poemId": 24, "type": "author", "title": "滁州西涧", "author": "韦应物", "question": "《滁州西涧》的作者是？", "hint": "唐代诗人", "answer": "韦应物", "excerpt": "野渡无人舟自横", "xubi": 6, "options": ["赵师秀", "王之涣", "林升", "韦应物"]}, {"id": 73, "poemId": 25, "type": "fill", "title": "乌衣巷", "author": "刘禹锡", "question": "朱雀桥＿野草花，", "hint": "《乌衣巷》刘禹锡", "answer": "边", "fullLine": "朱雀桥边野草花，", "xubi": 5, "options": ["边", "每", "纷", "晴"]}, {"id": 74, "poemId": 25, "type": "next", "title": "乌衣巷", "author": "刘禹锡", "question": "朱雀桥边野草花，", "hint": "《乌衣巷》下一句是？", "answer": "乌衣巷口夕阳斜。", "xubi": 8, "options": ["一任群芳妒。", "但悲不见九州同。", "乌衣巷口夕阳斜。", "山外青山楼外楼，"]}, {"id": 75, "poemId": 25, "type": "author", "title": "乌衣巷", "author": "刘禹锡", "question": "《乌衣巷》的作者是？", "hint": "唐代诗人", "answer": "刘禹锡", "excerpt": "旧时王谢堂前燕，飞入寻常百姓家", "xubi": 6, "options": ["王昌龄", "刘禹锡", "李白", "苏轼"]}, {"id": 76, "poemId": 26, "type": "fill", "title": "题都城南庄", "author": "崔护", "question": "去年今＿此门中，", "hint": "《题都城南庄》崔护", "answer": "日", "fullLine": "去年今日此门中，", "xubi": 5, "options": ["日", "美", "依", "郭"]}, {"id": 77, "poemId": 26, "type": "next", "title": "题都城南庄", "author": "崔护", "question": "去年今日此门中，", "hint": "《题都城南庄》下一句是？", "answer": "人面桃花相映红。", "xubi": 8, "options": ["零落成泥碾作尘，", "低头思故乡。", "人面桃花相映红。", "莲动下渔舟。"]}, {"id": 78, "poemId": 26, "type": "author", "title": "题都城南庄", "author": "崔护", "question": "《题都城南庄》的作者是？", "hint": "唐代诗人", "answer": "崔护", "excerpt": "人面不知何处去，桃花依旧笑春风", "xubi": 6, "options": ["崔护", "孟郊", "朱熹", "龚自珍"]}, {"id": 79, "poemId": 27, "type": "fill", "title": "游子吟", "author": "孟郊", "question": "慈母＿中线，", "hint": "《游子吟》孟郊", "answer": "手", "fullLine": "慈母手中线，", "xubi": 5, "options": ["临", "手", "独", "览"]}, {"id": 80, "poemId": 27, "type": "next", "title": "游子吟", "author": "孟郊", "question": "慈母手中线，", "hint": "《游子吟》下一句是？", "answer": "游子身上衣。", "xubi": 8, "options": ["渚清沙白鸟飞回。", "夜半钟声到客船。", "游子身上衣。", "山色空蒙雨亦奇。"]}, {"id": 81, "poemId": 27, "type": "author", "title": "游子吟", "author": "孟郊", "question": "《游子吟》的作者是？", "hint": "唐代诗人", "answer": "孟郊", "excerpt": "谁言寸草心，报得三春晖", "xubi": 6, "options": ["孟郊", "王昌龄", "朱熹", "李清照"]}, {"id": 82, "poemId": 28, "type": "fill", "title": "清明", "author": "杜牧", "question": "清明时＿雨纷纷，", "hint": "《清明》杜牧", "answer": "节", "fullLine": "清明时节雨纷纷，", "xubi": 5, "options": ["节", "荷", "气", "立"]}, {"id": 83, "poemId": 28, "type": "next", "title": "清明", "author": "杜牧", "question": "清明时节雨纷纷，", "hint": "《清明》下一句是？", "answer": "路上行人欲断魂。", "xubi": 8, "options": ["门泊东吴万里船。", "路上行人欲断魂。", "横看成岭侧成峰，", "复照青苔上。"]}, {"id": 84, "poemId": 28, "type": "author", "title": "清明", "author": "杜牧", "question": "《清明》的作者是？", "hint": "唐代诗人", "answer": "杜牧", "excerpt": "清明时节雨纷纷，路上行人欲断魂", "xubi": 6, "options": ["苏轼", "杜牧", "杨万里", "李白"]}, {"id": 85, "poemId": 29, "type": "fill", "title": "山行", "author": "杜牧", "question": "远上寒＿石径斜，", "hint": "《山行》杜牧", "answer": "山", "fullLine": "远上寒山石径斜，", "xubi": 5, "options": ["停", "莲", "动", "山"]}, {"id": 86, "poemId": 29, "type": "next", "title": "山行", "author": "杜牧", "question": "远上寒山石径斜，", "hint": "《山行》下一句是？", "answer": "白云生处有人家。", "xubi": 8, "options": ["白云生处有人家。", "闲敲棋子落灯花。", "碧水东流至此回。", "春潮带雨晚来急，"]}, {"id": 87, "poemId": 29, "type": "author", "title": "山行", "author": "杜牧", "question": "《山行》的作者是？", "hint": "唐代诗人", "answer": "杜牧", "excerpt": "霜叶红于二月花", "xubi": 6, "options": ["李清照", "杜牧", "李白", "苏轼"]}, {"id": 88, "poemId": 30, "type": "fill", "title": "泊秦淮", "author": "杜牧", "question": "烟笼寒＿月笼沙，", "hint": "《泊秦淮》杜牧", "answer": "水", "fullLine": "烟笼寒水月笼沙，", "xubi": 5, "options": ["坐", "客", "水", "闲"]}, {"id": 89, "poemId": 30, "type": "next", "title": "泊秦淮", "author": "杜牧", "question": "烟笼寒水月笼沙，", "hint": "《泊秦淮》下一句是？", "answer": "夜泊秦淮近酒家。", "xubi": 8, "options": ["千里江陵一日还。", "浑欲不胜簪。", "夜泊秦淮近酒家。", "大江东去，"]}, {"id": 90, "poemId": 30, "type": "author", "title": "泊秦淮", "author": "杜牧", "question": "《泊秦淮》的作者是？", "hint": "唐代诗人", "answer": "杜牧", "excerpt": "商女不知亡国恨，隔江犹唱后庭花", "xubi": 6, "options": ["贾岛", "王翰", "崔护", "杜牧"]}, {"id": 91, "poemId": 31, "type": "fill", "title": "寻隐者不遇", "author": "贾岛", "question": "松下＿童子，", "hint": "《寻隐者不遇》贾岛", "answer": "问", "fullLine": "松下问童子，", "xubi": 5, "options": ["觉", "问", "西", "石"]}, {"id": 92, "poemId": 31, "type": "next", "title": "寻隐者不遇", "author": "贾岛", "question": "松下问童子，", "hint": "《寻隐者不遇》下一句是？", "answer": "言师采药去。", "xubi": 8, "options": ["我欲乘风归去，", "万径人踪灭。", "乱石穿空，惊涛拍岸，", "言师采药去。"]}, {"id": 93, "poemId": 31, "type": "author", "title": "寻隐者不遇", "author": "贾岛", "question": "《寻隐者不遇》的作者是？", "hint": "唐代诗人", "answer": "贾岛", "excerpt": "只在此山中，云深不知处", "xubi": 6, "options": ["王翰", "赵师秀", "贾岛", "王之涣"]}, {"id": 94, "poemId": 32, "type": "fill", "title": "悯农·其一", "author": "李绅", "question": "锄禾＿当午，", "hint": "《悯农·其一》李绅", "answer": "日", "fullLine": "锄禾日当午，", "xubi": 5, "options": ["日", "窗", "楼", "挂"]}, {"id": 95, "poemId": 32, "type": "next", "title": "悯农·其一", "author": "李绅", "question": "锄禾日当午，", "hint": "《悯农·其一》下一句是？", "answer": "汗滴禾下土。", "xubi": 8, "options": ["汗滴禾下土。", "映日荷花别样红。", "小楼昨夜又东风，", "乌衣巷口夕阳斜。"]}, {"id": 96, "poemId": 32, "type": "author", "title": "悯农·其一", "author": "李绅", "question": "《悯农·其一》的作者是？", "hint": "唐代诗人", "answer": "李绅", "excerpt": "谁知盘中餐，粒粒皆辛苦", "xubi": 6, "options": ["王维", "李绅", "赵师秀", "杜牧"]}, {"id": 97, "poemId": 33, "type": "fill", "title": "江南春", "author": "杜牧", "question": "千里莺＿绿映红，", "hint": "《江南春》杜牧", "answer": "啼", "fullLine": "千里莺啼绿映红，", "xubi": 5, "options": ["啼", "年", "兴", "萧"]}, {"id": 98, "poemId": 33, "type": "next", "title": "江南春", "author": "杜牧", "question": "千里莺啼绿映红，", "hint": "《江南春》下一句是？", "answer": "水村山郭酒旗风。", "xubi": 8, "options": ["水村山郭酒旗风。", "水光潋滟晴方好，", "城春草木深。", "疑是银河落九天。"]}, {"id": 99, "poemId": 33, "type": "author", "title": "江南春", "author": "杜牧", "question": "《江南春》的作者是？", "hint": "唐代诗人", "answer": "杜牧", "excerpt": "南朝四百八十寺，多少楼台烟雨中", "xubi": 6, "options": ["朱熹", "杜甫", "杜牧", "贺知章"]}, {"id": 100, "poemId": 34, "type": "fill", "title": "如梦令", "author": "李清照", "question": "常记溪＿日暮，", "hint": "《如梦令》李清照", "answer": "亭", "fullLine": "常记溪亭日暮，", "xubi": 5, "options": ["渔", "恨", "石", "亭"]}, {"id": 101, "poemId": 34, "type": "next", "title": "如梦令", "author": "李清照", "question": "常记溪亭日暮，", "hint": "《如梦令》下一句是？", "answer": "沉醉不知归路。", "xubi": 8, "options": ["岱宗夫如何？", "松下问童子，", "沉醉不知归路。", "桃花依旧笑春风。"]}, {"id": 102, "poemId": 34, "type": "author", "title": "如梦令", "author": "李清照", "question": "《如梦令》的作者是？", "hint": "宋代诗人", "answer": "李清照", "excerpt": "误入藕花深处，惊起一滩鸥鹭", "xubi": 6, "options": ["白居易", "杨万里", "王昌龄", "李清照"]}, {"id": 103, "poemId": 35, "type": "fill", "title": "声声慢", "author": "李清照", "question": "寻寻＿觅，", "hint": "《声声慢》李清照", "answer": "觅", "fullLine": "寻寻觅觅，", "xubi": 5, "options": ["觅", "出", "鬓", "曾"]}, {"id": 104, "poemId": 35, "type": "next", "title": "声声慢", "author": "李清照", "question": "寻寻觅觅，", "hint": "《声声慢》下一句是？", "answer": "冷冷清清，", "xubi": 8, "options": ["接天莲叶无穷碧，", "冷冷清清，", "万紫千红总是春。", "隔江犹唱后庭花。"]}, {"id": 105, "poemId": 35, "type": "author", "title": "声声慢", "author": "李清照", "question": "《声声慢》的作者是？", "hint": "宋代诗人", "answer": "李清照", "excerpt": "寻寻觅觅，冷冷清清，凄凄惨惨戚戚", "xubi": 6, "options": ["贾岛", "杨万里", "林升", "李清照"]}, {"id": 106, "poemId": 36, "type": "fill", "title": "相见欢", "author": "李煜", "question": "无言独＿西楼，", "hint": "《相见欢》李煜", "answer": "上", "fullLine": "无言独上西楼，", "xubi": 5, "options": ["簪", "上", "候", "空"]}, {"id": 107, "poemId": 36, "type": "next", "title": "相见欢", "author": "李煜", "question": "无言独上西楼，", "hint": "《相见欢》下一句是？", "answer": "月如钩。", "xubi": 8, "options": ["沉醉不知归路。", "空山不见人，", "谁知盘中餐，", "月如钩。"]}, {"id": 108, "poemId": 36, "type": "author", "title": "相见欢", "author": "李煜", "question": "《相见欢》的作者是？", "hint": "五代代诗人", "answer": "李煜", "excerpt": "剪不断，理还乱，是离愁", "xubi": 6, "options": ["赵师秀", "李清照", "孟郊", "李煜"]}, {"id": 109, "poemId": 37, "type": "fill", "title": "水调歌头·明月几时有", "author": "苏轼", "question": "明月＿时有？", "hint": "《水调歌头·明月几时有》苏轼", "answer": "几", "fullLine": "明月几时有？", "xubi": 5, "options": ["几", "冷", "鸟", "鲁"]}, {"id": 110, "poemId": 37, "type": "next", "title": "水调歌头·明月几时有", "author": "苏轼", "question": "明月几时有？", "hint": "《水调歌头·明月几时有》下一句是？", "answer": "把酒问青天。", "xubi": 8, "options": ["早有蜻蜓立上头。", "把酒问青天。", "潦倒新停浊酒杯。", "化作春泥更护花。"]}, {"id": 111, "poemId": 37, "type": "author", "title": "水调歌头·明月几时有", "author": "苏轼", "question": "《水调歌头·明月几时有》的作者是？", "hint": "宋代诗人", "answer": "苏轼", "excerpt": "但愿人长久，千里共婵娟", "xubi": 6, "options": ["孟浩然", "李绅", "贾岛", "苏轼"]}, {"id": 112, "poemId": 38, "type": "fill", "title": "念奴娇·赤壁怀古", "author": "苏轼", "question": "大江＿去，", "hint": "《念奴娇·赤壁怀古》苏轼", "answer": "东", "fullLine": "大江东去，", "xubi": 5, "options": ["恐", "黄", "东", "作"]}, {"id": 113, "poemId": 38, "type": "next", "title": "念奴娇·赤壁怀古", "author": "苏轼", "question": "大江东去，", "hint": "《念奴娇·赤壁怀古》下一句是？", "answer": "浪淘尽，千古风流人物。", "xubi": 8, "options": ["独钓寒江雪。", "浪淘尽，千古风流人物。", "烟花三月下扬州。", "乍暖还寒时候，"]}, {"id": 114, "poemId": 38, "type": "author", "title": "念奴娇·赤壁怀古", "author": "苏轼", "question": "《念奴娇·赤壁怀古》的作者是？", "hint": "宋代诗人", "answer": "苏轼", "excerpt": "大江东去，浪淘尽，千古风流人物", "xubi": 6, "options": ["杜牧", "苏轼", "刘禹锡", "王翰"]}, {"id": 115, "poemId": 39, "type": "fill", "title": "题西林壁", "author": "苏轼", "question": "横看成＿侧成峰，", "hint": "《题西林壁》苏轼", "answer": "岭", "fullLine": "横看成岭侧成峰，", "xubi": 5, "options": ["览", "齐", "衣", "岭"]}, {"id": 116, "poemId": 39, "type": "next", "title": "题西林壁", "author": "苏轼", "question": "横看成岭侧成峰，", "hint": "《题西林壁》下一句是？", "answer": "远近高低各不同。", "xubi": 8, "options": ["水村山郭酒旗风。", "远近高低各不同。", "浑欲不胜簪。", "高处不胜寒。"]}, {"id": 117, "poemId": 39, "type": "author", "title": "题西林壁", "author": "苏轼", "question": "《题西林壁》的作者是？", "hint": "宋代诗人", "answer": "苏轼", "excerpt": "不识庐山真面目，只缘身在此山中", "xubi": 6, "options": ["刘禹锡", "王维", "苏轼", "朱熹"]}, {"id": 118, "poemId": 40, "type": "fill", "title": "饮湖上初晴后雨", "author": "苏轼", "question": "水光潋＿晴方好，", "hint": "《饮湖上初晴后雨》苏轼", "answer": "滟", "fullLine": "水光潋滟晴方好，", "xubi": 5, "options": ["秀", "窗", "烟", "滟"]}, {"id": 119, "poemId": 40, "type": "next", "title": "饮湖上初晴后雨", "author": "苏轼", "question": "水光潋滟晴方好，", "hint": "《饮湖上初晴后雨》下一句是？", "answer": "山色空蒙雨亦奇。", "xubi": 8, "options": ["遥看瀑布挂前川。", "不知天上宫阙，", "山色空蒙雨亦奇。", "愿君多采撷，"]}, {"id": 120, "poemId": 40, "type": "author", "title": "饮湖上初晴后雨", "author": "苏轼", "question": "《饮湖上初晴后雨》的作者是？", "hint": "宋代诗人", "answer": "苏轼", "excerpt": "欲把西湖比西子，淡妆浓抹总相宜", "xubi": 6, "options": ["苏轼", "贾岛", "李清照", "陆游"]}, {"id": 121, "poemId": 41, "type": "fill", "title": "春日", "author": "朱熹", "question": "胜日寻＿泗水滨，", "hint": "《春日》朱熹", "answer": "芳", "fullLine": "胜日寻芳泗水滨，", "xubi": 5, "options": ["芳", "住", "今", "临"]}, {"id": 122, "poemId": 41, "type": "next", "title": "春日", "author": "朱熹", "question": "胜日寻芳泗水滨，", "hint": "《春日》下一句是？", "answer": "无边光景一时新。", "xubi": 8, "options": ["西湖歌舞几时休。", "无边光景一时新。", "桃花依旧笑春风。", "野渡无人舟自横。"]}, {"id": 123, "poemId": 41, "type": "author", "title": "春日", "author": "朱熹", "question": "《春日》的作者是？", "hint": "宋代诗人", "answer": "朱熹", "excerpt": "万紫千红总是春", "xubi": 6, "options": ["朱熹", "韦应物", "杜牧", "陆游"]}, {"id": 124, "poemId": 42, "type": "fill", "title": "晓出净慈寺送林子方", "author": "杨万里", "question": "毕竟西＿六月中，", "hint": "《晓出净慈寺送林子方》杨万里", "answer": "湖", "fullLine": "毕竟西湖六月中，", "xubi": 5, "options": ["归", "宇", "湖", "何"]}, {"id": 125, "poemId": 42, "type": "next", "title": "晓出净慈寺送林子方", "author": "杨万里", "question": "毕竟西湖六月中，", "hint": "《晓出净慈寺送林子方》下一句是？", "answer": "风光不与四时同。", "xubi": 8, "options": ["风光不与四时同。", "王师北定中原日，", "两岸青山相对出，", "会当凌绝顶，"]}, {"id": 126, "poemId": 42, "type": "author", "title": "晓出净慈寺送林子方", "author": "杨万里", "question": "《晓出净慈寺送林子方》的作者是？", "hint": "宋代诗人", "answer": "杨万里", "excerpt": "接天莲叶无穷碧，映日荷花别样红", "xubi": 6, "options": ["龚自珍", "林升", "王维", "杨万里"]}, {"id": 127, "poemId": 43, "type": "fill", "title": "小池", "author": "杨万里", "question": "泉眼无＿惜细流，", "hint": "《小池》杨万里", "answer": "声", "fullLine": "泉眼无声惜细流，", "xubi": 5, "options": ["即", "声", "映", "撷"]}, {"id": 128, "poemId": 43, "type": "next", "title": "小池", "author": "杨万里", "question": "泉眼无声惜细流，", "hint": "《小池》下一句是？", "answer": "树阴照水爱晴柔。", "xubi": 8, "options": ["游子身上衣。", "树阴照水爱晴柔。", "大江东去，", "是离愁。"]}, {"id": 129, "poemId": 43, "type": "author", "title": "小池", "author": "杨万里", "question": "《小池》的作者是？", "hint": "宋代诗人", "answer": "杨万里", "excerpt": "小荷才露尖尖角，早有蜻蜓立上头", "xubi": 6, "options": ["朱熹", "杨万里", "韦应物", "王翰"]}, {"id": 130, "poemId": 44, "type": "fill", "title": "约客", "author": "赵师秀", "question": "黄梅时＿家家雨，", "hint": "《约客》赵师秀", "answer": "节", "fullLine": "黄梅时节家家雨，", "xubi": 5, "options": ["节", "连", "翁", "阴"]}, {"id": 131, "poemId": 44, "type": "next", "title": "约客", "author": "赵师秀", "question": "黄梅时节家家雨，", "hint": "《约客》下一句是？", "answer": "青草池塘处处蛙。", "xubi": 8, "options": ["青草池塘处处蛙。", "只在此山中，", "独怜幽草涧边生，", "胜日寻芳泗水滨，"]}, {"id": 132, "poemId": 44, "type": "author", "title": "约客", "author": "赵师秀", "question": "《约客》的作者是？", "hint": "宋代诗人", "answer": "赵师秀", "excerpt": "闲敲棋子落灯花", "xubi": 6, "options": ["韦应物", "林升", "贺知章", "赵师秀"]}, {"id": 133, "poemId": 45, "type": "fill", "title": "示儿", "author": "陆游", "question": "死去元＿万事空，", "hint": "《示儿》陆游", "answer": "知", "fullLine": "死去元知万事空，", "xubi": 5, "options": ["迟", "炉", "知", "伦"]}, {"id": 134, "poemId": 45, "type": "next", "title": "示儿", "author": "陆游", "question": "死去元知万事空，", "hint": "《示儿》下一句是？", "answer": "但悲不见九州同。", "xubi": 8, "options": ["淡妆浓抹总相宜。", "艰难苦恨繁霜鬓，", "但悲不见九州同。", "意恐迟迟归。"]}, {"id": 135, "poemId": 45, "type": "author", "title": "示儿", "author": "陆游", "question": "《示儿》的作者是？", "hint": "宋代诗人", "answer": "陆游", "excerpt": "王师北定中原日，家祭无忘告乃翁", "xubi": 6, "options": ["林升", "陆游", "王昌龄", "贺知章"]}, {"id": 136, "poemId": 46, "type": "fill", "title": "秋夜将晓出篱门迎凉有感", "author": "陆游", "question": "三万里＿东入海，", "hint": "《秋夜将晓出篱门迎凉有感》陆游", "answer": "河", "fullLine": "三万里河东入海，", "xubi": 5, "options": ["凌", "后", "梅", "河"]}, {"id": 137, "poemId": 46, "type": "next", "title": "秋夜将晓出篱门迎凉有感", "author": "陆游", "question": "三万里河东入海，", "hint": "《秋夜将晓出篱门迎凉有感》下一句是？", "answer": "五千仞岳上摩天。", "xubi": 8, "options": ["故垒西边，", "李白乘舟将欲行，", "五千仞岳上摩天。", "寂寞梧桐深院锁清秋。"]}, {"id": 138, "poemId": 46, "type": "author", "title": "秋夜将晓出篱门迎凉有感", "author": "陆游", "question": "《秋夜将晓出篱门迎凉有感》的作者是？", "hint": "宋代诗人", "answer": "陆游", "excerpt": "遗民泪尽胡尘里，南望王师又一年", "xubi": 6, "options": ["陆游", "贺知章", "刘禹锡", "贾岛"]}, {"id": 139, "poemId": 47, "type": "fill", "title": "题临安邸", "author": "林升", "question": "＿外青山楼外楼，", "hint": "《题临安邸》林升", "answer": "山", "fullLine": "山外青山楼外楼，", "xubi": 5, "options": ["叶", "踪", "山", "竹"]}, {"id": 140, "poemId": 47, "type": "next", "title": "题临安邸", "author": "林升", "question": "山外青山楼外楼，", "hint": "《题临安邸》下一句是？", "answer": "西湖歌舞几时休。", "xubi": 8, "options": ["返景入深林，", "报得三春晖。", "飞流直下三千尺，", "西湖歌舞几时休。"]}, {"id": 141, "poemId": 47, "type": "author", "title": "题临安邸", "author": "林升", "question": "《题临安邸》的作者是？", "hint": "宋代诗人", "answer": "林升", "excerpt": "暖风熏得游人醉，直把杭州作汴州", "xubi": 6, "options": ["王之涣", "刘禹锡", "贺知章", "林升"]}, {"id": 142, "poemId": 48, "type": "fill", "title": "己亥杂诗", "author": "龚自珍", "question": "浩荡离＿白日斜，", "hint": "《己亥杂诗》龚自珍", "answer": "愁", "fullLine": "浩荡离愁白日斜，", "xubi": 5, "options": ["愁", "白", "溅", "惊"]}, {"id": 143, "poemId": 48, "type": "next", "title": "己亥杂诗", "author": "龚自珍", "question": "浩荡离愁白日斜，", "hint": "《己亥杂诗》下一句是？", "answer": "吟鞭东指即天涯。", "xubi": 8, "options": ["吟鞭东指即天涯。", "飞入寻常百姓家。", "乌衣巷口夕阳斜。", "问君能有几多愁？"]}, {"id": 144, "poemId": 48, "type": "author", "title": "己亥杂诗", "author": "龚自珍", "question": "《己亥杂诗》的作者是？", "hint": "清代诗人", "answer": "龚自珍", "excerpt": "落红不是无情物，化作春泥更护花", "xubi": 6, "options": ["韦应物", "刘禹锡", "杜甫", "龚自珍"]}, {"id": 145, "poemId": 49, "type": "fill", "title": "卜算子·咏梅", "author": "陆游", "question": "驿外＿桥边，", "hint": "《卜算子·咏梅》陆游", "answer": "断", "fullLine": "驿外断桥边，", "xubi": 5, "options": ["雪", "登", "秋", "断"]}, {"id": 146, "poemId": 49, "type": "next", "title": "卜算子·咏梅", "author": "陆游", "question": "驿外断桥边，", "hint": "《卜算子·咏梅》下一句是？", "answer": "寂寞开无主。", "xubi": 8, "options": ["云深不知处。", "疑是银河落九天。", "寂寞开无主。", "葡萄美酒夜光杯，"]}, {"id": 147, "poemId": 49, "type": "author", "title": "卜算子·咏梅", "author": "陆游", "question": "《卜算子·咏梅》的作者是？", "hint": "宋代诗人", "answer": "陆游", "excerpt": "零落成泥碾作尘，只有香如故", "xubi": 6, "options": ["王维", "陆游", "杜牧", "龚自珍"]}, {"id": 148, "poemId": 50, "type": "fill", "title": "虞美人", "author": "李煜", "question": "春花秋＿何时了？", "hint": "《虞美人》李煜", "answer": "月", "fullLine": "春花秋月何时了？", "xubi": 5, "options": ["绦", "花", "月", "宜"]}, {"id": 149, "poemId": 50, "type": "next", "title": "虞美人", "author": "李煜", "question": "春花秋月何时了？", "hint": "《虞美人》下一句是？", "answer": "往事知多少。", "xubi": 8, "options": ["早有蜻蜓立上头。", "往事知多少。", "黄梅时节家家雨，", "不尽长江滚滚来。"]}, {"id": 150, "poemId": 50, "type": "author", "title": "虞美人", "author": "李煜", "question": "《虞美人》的作者是？", "hint": "五代代诗人", "answer": "李煜", "excerpt": "问君能有几多愁？恰似一江春水向东流", "xubi": 6, "options": ["王翰", "李煜", "龚自珍", "柳宗元"]}];
+
+// ════ STATE ════
+var S = JSON.parse(localStorage.getItem("sjxt2") || "null") || {
+  xubi:30, exp:0, streak:0, lastDate:"", dailyDone:false, dailyEarned:0,
+  totalCorrect:0, totalAnswered:0, costume:"default", owned:["default"],
+  wrongBook:[]
+};
+function save(){ localStorage.setItem("sjxt2", JSON.stringify(S)); }
+
+// ════ RANKS ════
+var RANKS=[
+  {name:"童生",min:0,   max:100,  color:"#8d6e63"},
+  {name:"秀才",min:100, max:300,  color:"#546e7a"},
+  {name:"举人",min:300, max:700,  color:"#2e7d52"},
+  {name:"进士",min:700, max:1500, color:"#1565c0"},
+  {name:"状元",min:1500,max:9999, color:"#c0392b"}
+];
+function getRank(e){ for(var i=RANKS.length-1;i>=0;i--) if(e>=RANKS[i].min) return RANKS[i]; return RANKS[0]; }
+function getNext(e){ var r=getRank(e),i=RANKS.indexOf(r); return i<RANKS.length-1?RANKS[i+1]:null; }
+
+// ════ COSTUMES ════
+var COSTUMES=[
+  {id:"default",name:"自然装",icon:"🐦",price:0},
+  {id:"hanfu",  name:"汉服",  icon:"👘",price:50},
+  {id:"scholar",name:"书童装",icon:"📚",price:80},
+  {id:"general",name:"将军盔",icon:"⚔️", price:120},
+  {id:"fairy",  name:"仙子羽",icon:"🧚",price:150},
+  {id:"emperor",name:"帝王袍",icon:"👑",price:300}
+];
+var CO_SVG={
+  default:"",
+  hanfu:'<ellipse cx="60" cy="80" rx="32" ry="18" fill="rgba(180,100,120,0.7)"/>',
+  scholar:'<rect x="46" y="58" width="28" height="8" rx="2" fill="rgba(80,60,40,0.75)"/>',
+  general:'<polygon points="60,28 50,36 70,36" fill="rgba(160,120,40,0.85)"/><rect x="50" y="36" width="20" height="4" fill="rgba(160,120,40,0.7)"/>',
+  fairy:'<ellipse cx="36" cy="64" rx="10" ry="18" fill="rgba(200,180,240,0.55)" transform="rotate(-30,36,64)"/><ellipse cx="84" cy="64" rx="10" ry="18" fill="rgba(200,180,240,0.55)" transform="rotate(30,84,64)"/>',
+  emperor:'<rect x="48" y="56" width="24" height="30" fill="rgba(180,30,30,0.6)"/><polygon points="60,24 52,34 68,34" fill="rgba(210,170,0,0.9)"/>'
+};
+
+// ════ FILTER OPTIONS ════
+var FOPTS={
+  season:["春","夏","秋","冬"],
+  weather:["晴","雨","雪","月明","风","霜","雾"],
+  mood:["宁静","惬意","喜悦","壮阔","孤独","忧愁","思乡","感动","思念"],
+  theme:["山水","田园","送别","友情","相思","爱情","亲情","思乡","羁旅","边塞","咏物","咏史","怀古","忧国","节日","登高","哲理","隐逸","战争","悯农","亡国"],
+  form:["五言绝句","七言绝句","五言律诗","七言律诗","五言古诗","词·如梦令","词·声声慢","词·相见欢","词·水调歌头","词·念奴娇","词·卜算子","词·虞美人"],
+  lifestage:["童年","青春","中年","晚年"]
+};
+
+// ════ JIEQI ════
+var JM={
+  "立春":{s:"春",tag:"🌱 立春"},"雨水":{s:"春",tag:"🌧 雨水"},"惊蛰":{s:"春",tag:"⚡ 惊蛰"},
+  "春分":{s:"春",tag:"🌸 春分"},"清明":{s:"春",tag:"☔ 清明"},"谷雨":{s:"春",tag:"🌧 谷雨"},
+  "立夏":{s:"夏",tag:"☀ 立夏"},"小满":{s:"夏",tag:"🌾 小满"},"芒种":{s:"夏",tag:"🌿 芒种"},
+  "夏至":{s:"夏",tag:"☀ 夏至"},"小暑":{s:"夏",tag:"🌤 小暑"},"大暑":{s:"夏",tag:"🔆 大暑"},
+  "立秋":{s:"秋",tag:"🍂 立秋"},"处暑":{s:"秋",tag:"🌤 处暑"},"白露":{s:"秋",tag:"💧 白露"},
+  "秋分":{s:"秋",tag:"🌕 秋分"},"寒露":{s:"秋",tag:"🌫 寒露"},"霜降":{s:"秋",tag:"❄ 霜降"},
+  "立冬":{s:"冬",tag:"🍃 立冬"},"小雪":{s:"冬",tag:"❄ 小雪"},"大雪":{s:"冬",tag:"❄ 大雪"},
+  "冬至":{s:"冬",tag:"🌙 冬至"},"小寒":{s:"冬",tag:"❄ 小寒"},"大寒":{s:"冬",tag:"❄ 大寒"},
+  "重阳":{s:"秋",tag:"🍂 重阳"},"中秋":{s:"秋",tag:"🌕 中秋"}
+};
+function getJQ(){
+  var now=new Date(),mo=now.getMonth()+1,d=now.getDate();
+  var ds=[[1,20,"大寒"],[2,4,"立春"],[2,19,"雨水"],[3,6,"惊蛰"],[3,20,"春分"],
+    [4,5,"清明"],[4,20,"谷雨"],[5,6,"立夏"],[5,21,"小满"],[6,6,"芒种"],
+    [6,21,"夏至"],[7,7,"小暑"],[7,23,"大暑"],[8,7,"立秋"],[8,23,"处暑"],
+    [9,8,"白露"],[9,23,"秋分"],[10,8,"寒露"],[10,23,"霜降"],[11,7,"立冬"],
+    [11,22,"小雪"],[12,7,"大雪"],[12,22,"冬至"],[1,6,"小寒"]];
+  var best="春分",bd=999;
+  for(var i=0;i<ds.length;i++){var diff=(mo-ds[i][0])*30+(d-ds[i][1]);if(diff<0)diff+=365;if(diff<bd){bd=diff;best=ds[i][2];}}
+  return best;
+}
+function getDailyP(){
+  var jq=getJQ(),info=JM[jq]||{s:"春",tag:"🌸 节气"};
+  var c=POEMS.filter(function(p){return p.jieqi&&p.jieqi.indexOf(jq)>=0;});
+  if(!c.length)c=POEMS.filter(function(p){return p.season&&p.season.indexOf(info.s)>=0;});
+  if(!c.length)c=POEMS;
+  return{poem:c[new Date().getDate()%c.length],jq:jq,tag:info.tag};
+}
+
+// ════ TOAST ════
+function toast(msg){
+  var t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("on");
+  setTimeout(function(){t.classList.remove("on");},2200);
+}
+
+// ════ NAVIGATION ════
+var curPg="home";
+function nav(pg){
+  var el=document.getElementById("pg-"+pg);
+  if(!el)return;
+  document.querySelectorAll(".pg").forEach(function(p){p.classList.remove("on");});
+  el.classList.add("on");
+  document.querySelectorAll(".nv").forEach(function(b){b.classList.remove("on");});
+  var nb=document.querySelector('.nv[data-pg="'+pg+'"]');
+  if(nb)nb.classList.add("on");
+  curPg=pg;
+  if(pg==="home") initHome();
+  if(pg==="learn") initLib();
+  if(pg==="test"){ document.getElementById("quizXubi").textContent=S.xubi; initDaily(); }
+  if(pg==="ai") initAI();
+  if(pg==="poets") initPoetsPage();
+  if(pg==="me") renderBird();
+}
+function navSub(pg,sub){
+  nav(pg);
+  var el=document.getElementById("pg-"+pg);
+  if(!el)return;
+  el.querySelectorAll(".stab").forEach(function(b){b.classList.remove("on");});
+  var sb=el.querySelector('.stab[data-sub="'+sub+'"]');
+  if(sb)sb.classList.add("on");
+  el.querySelectorAll(".spg").forEach(function(p){p.classList.remove("on");});
+  var sp=document.getElementById("spg-"+sub);
+  if(sp)sp.classList.add("on");
+  if(sub==="learn-lib") initLib();
+  if(sub==="test-wrong") initWB();
+  if(sub==="me-bird") renderBird();
+  if(sub==="learn-poets") initPoetsGallery();
+  if(sub==="me-rank") renderRank();
+}
+// Bottom nav clicks
+document.querySelectorAll(".nv").forEach(function(btn){
+  btn.addEventListener("click",function(){nav(btn.dataset.pg);});
+});
+// Sub tab clicks
+document.querySelectorAll(".stab").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    var pg=btn.closest(".pg").id.replace("pg-","");
+    navSub(pg,btn.dataset.sub);
+  });
+});
+
+// ════ HOME ════
+function initHome(){
+  var r=getRank(S.exp);
+  document.getElementById("hXubi").textContent=S.xubi;
+  document.getElementById("hStreak").textContent=S.streak;
+  document.getElementById("hRank").textContent=r.name;
+  var rb=document.getElementById("hRankBadge");
+  if(rb)rb.textContent=r.name;
+  document.getElementById("hStreakTxt").textContent=S.streak+"天🔥";
+  var res=getDailyP();
+  document.getElementById("hDailyPoem").textContent=res.poem.excerpt;
+  document.getElementById("hDailyMeta").textContent=
+    "《"+res.poem.title+"》"+res.poem.author+" · "+res.tag;
+  document.getElementById("hDailyStrip").onclick=function(){nav("test");};
+}
+
+// ════ LIB ════
+var showPy=false, curTab="season", curFilter="春", modalPoemId=null;
+
+function initLib(){
+  var res=getDailyP();
+  var p=res.poem;
+  document.getElementById("libDailyTitle").textContent=p.title;
+  document.getElementById("libDailyWtag").textContent=res.tag+" · "+res.jq;
+  var body=document.getElementById("libDailyBody");
+  body.innerHTML=""; body.appendChild(makePyLines(p.lines));
+  document.getElementById("libDailyDyn").textContent=p.dynasty+"代";
+  document.getElementById("libDailyAuth").textContent=p.author;
+  document.getElementById("libDailyMood").textContent=p.mood.join(" · ");
+  document.getElementById("libDailyCard").onclick=function(){openModal(p.id);};
+  renderChips(); renderGrid();
+}
+function makePyLines(lines){
+  var frag=document.createDocumentFragment();
+  lines.forEach(function(l){
+    var w=document.createElement("div"); w.className="pl";
+    var py=document.createElement("span"); py.className="py";
+    py.textContent=l.pinyin; py.style.display=showPy?"block":"none";
+    var lt=document.createElement("span"); lt.className="lt"; lt.textContent=l.text;
+    w.appendChild(py); w.appendChild(lt); frag.appendChild(w);
+  });
+  return frag;
+}
+document.getElementById("pyBtn").addEventListener("click",function(){
+  showPy=!showPy;
+  this.textContent=showPy?"隐藏拼音":"显示拼音";
+  this.classList.toggle("on",showPy);
+  document.querySelectorAll(".py").forEach(function(el){el.style.display=showPy?"block":"none";});
+});
+document.querySelectorAll(".ftab").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".ftab").forEach(function(b){b.classList.remove("on");});
+    btn.classList.add("on");
+    curTab=btn.dataset.tab; curFilter=FOPTS[curTab][0];
+    renderChips(); renderGrid();
+  });
+});
+function renderChips(){
+  var opts=FOPTS[curTab], el=document.getElementById("chips");
+  el.innerHTML="";
+  opts.forEach(function(v){
+    var b=document.createElement("button"); b.className="chip"+(v===curFilter?" on":"");
+    b.textContent=v;
+    b.addEventListener("click",function(){
+      document.querySelectorAll(".chip").forEach(function(c){c.classList.remove("on");});
+      b.classList.add("on"); curFilter=v; renderGrid();
+    });
+    el.appendChild(b);
+  });
+}
+function renderGrid(){
+  var grid=document.getElementById("pgrid"); grid.innerHTML="";
+  var filtered=POEMS.filter(function(p){var a=p[curTab];return a&&a.indexOf(curFilter)>=0;});
+  if(!filtered.length){
+    var e=document.createElement("div"); e.className="empty"; e.textContent="暂无相关诗词";
+    grid.appendChild(e); return;
+  }
+  filtered.forEach(function(p){
+    var card=document.createElement("div"); card.className="pc";
+    var body=document.createElement("div"); body.className="pc-body";
+    var season=document.createElement("div"); season.className="pc-season";
+    season.textContent=p.season.join("·")+" "+(p.weatherTag||"");
+    var title=document.createElement("div"); title.className="pc-title"; title.textContent=p.title;
+    var exc=document.createElement("div"); exc.className="pc-excerpt"; exc.textContent=p.excerpt;
+    var foot=document.createElement("div"); foot.className="pc-foot";
+    var auth=document.createElement("span"); auth.className="pc-author"; auth.textContent=p.dynasty+"·"+p.author;
+    var mood=document.createElement("span"); mood.className="pc-mood"; mood.textContent=p.mood[0];
+    foot.appendChild(auth); foot.appendChild(mood);
+    body.appendChild(season); body.appendChild(title); body.appendChild(exc); body.appendChild(foot);
+    card.appendChild(body);
+    card.addEventListener("click",function(){openModal(p.id);});
+    grid.appendChild(card);
+  });
+}
+
+// ════ MODAL ════
+function openModal(id){
+  var p=POEMS.find(function(x){return x.id===id;}); if(!p)return;
+  modalPoemId=id;
+  var tagsEl=document.getElementById("modalTags"); tagsEl.innerHTML="";
+  [{t:p.dynasty+"代",r:true},{t:p.author}]
+    .concat(p.season.map(function(s){return{t:s};}))
+    .concat(p.mood.map(function(m){return{t:m};}))
+    .forEach(function(td){
+      var sp=document.createElement("span");
+      sp.className="mtag"+(td.r?" mtag-r":""); sp.textContent=td.t;
+      tagsEl.appendChild(sp);
+    });
+  document.getElementById("modalTitle").textContent=p.title;
+  document.getElementById("modalPoet").textContent=p.dynasty+"代 · "+p.author;
+  var mb=document.getElementById("modalBody"); mb.innerHTML=""; mb.appendChild(makePyLines(p.lines));
+  document.getElementById("modalNotes").textContent=p.notes;
+  initChat(p);
+  document.getElementById("ov").classList.add("on");
+  document.body.style.overflow="hidden";
+}
+function closeModal(){
+  document.getElementById("ov").classList.remove("on");
+  document.body.style.overflow="";
+}
+document.getElementById("modalX").addEventListener("click",closeModal);
+document.getElementById("ov").addEventListener("click",function(e){if(e.target===this)closeModal();});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeModal();});
+document.getElementById("modalQuiz").addEventListener("click",function(){
+  var id=modalPoemId; closeModal();
+  navSub("test","test-quiz"); startPoemQuiz(id);
+});
+document.getElementById("modalRec").addEventListener("click",function(){
+  var id=modalPoemId; closeModal();
+  navSub("learn","learn-poets");
+});
+
+// ════ DAILY ════
+function initDaily(){
+  var today=new Date().toLocaleDateString("zh-CN");
+  document.getElementById("dpDate").textContent=today+" · 每日一练";
+  document.getElementById("dpStreak").textContent="连续打卡 "+S.streak+" 天";
+  document.getElementById("dpXubi").textContent="+"+S.dailyEarned;
+  var dots=document.getElementById("dpDots"); dots.innerHTML="";
+  for(var i=0;i<7;i++){var d=document.createElement("div");d.className="sdot"+(i<S.streak?" done":"");dots.appendChild(d);}
+  if(S.lastDate!==today){S.lastDate=today;S.dailyDone=false;S.dailyEarned=0;save();}
+  var area=document.getElementById("dpArea");
+  if(S.dailyDone){
+    area.innerHTML="<div class='card' style='text-align:center;padding:24px'>" +
+      "<div style='font-size:2rem;margin-bottom:7px'>🎉</div>" +
+      "<div style='font-size:0.88rem;letter-spacing:0.22em;margin-bottom:6px'>今日已完成</div>" +
+      "<div style='font-size:0.62rem;color:var(--ink2);letter-spacing:0.16em;margin-bottom:13px'>明天再来挑战吧～</div>" +
+      "<div style='font-size:0.88rem;color:var(--gold);font-weight:700;letter-spacing:0.16em'>今日获得 "+S.dailyEarned+" 趣币 🪙</div>" +
+      "</div>"; return;
+  }
+  var q=QUESTIONS[new Date().getDate()%QUESTIONS.length];
+  renderQ(q,area,"daily");
+}
+
+// ════ QUIZ ════
+var QMAX=20, qPool=[], qIdx=0, qCor=0, qWrg=0, qMode="quiz";
+function startQuiz(type){
+  var pool=type==="all"?QUESTIONS.slice():QUESTIONS.filter(function(q){return q.type===type;});
+  for(var i=pool.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=pool[i];pool[i]=pool[j];pool[j]=t;}
+  qPool=pool.slice(0,QMAX); qIdx=0; qCor=0; qWrg=0; qMode="quiz";
+  showQProg(true); nextQ("quiz");
+}
+function startPoemQuiz(id){
+  var pool=QUESTIONS.filter(function(q){return q.poemId===id;});
+  if(!pool.length)pool=QUESTIONS.slice(0,5);
+  qPool=pool.slice(0,QMAX); qIdx=0; qCor=0; qWrg=0; qMode="quiz";
+  showQProg(true); nextQ("quiz");
+}
+function startWBQuiz(){
+  var wb=S.wrongBook||[];
+  if(!wb.length){toast("错题本是空的，继续努力！");return;}
+  var ids=wb.map(function(w){return w.qid;});
+  var pool=QUESTIONS.filter(function(q){return ids.indexOf(q.id)>=0;});
+  for(var i=pool.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=pool[i];pool[i]=pool[j];pool[j]=t;}
+  qPool=pool.slice(0,QMAX); qIdx=0; qCor=0; qWrg=0; qMode="wb";
+  navSub("test","test-quiz"); showQProg(true); nextQ("quiz");
+}
+function showQProg(on){
+  var p=document.getElementById("qprog");
+  if(p) p.style.display=on?"flex":"none";
+  updateQProg();
+}
+function updateQProg(){
+  var p=document.getElementById("qprog");
+  if(!p||p.style.display==="none")return;
+  var done=qIdx, total=qPool.length;
+  document.getElementById("qpC").textContent=done+"/"+total;
+  document.getElementById("qpFill").style.width=Math.round(done/total*100)+"%";
+  document.getElementById("qpS").textContent="✓"+qCor+" ✗"+qWrg;
+}
+function nextQ(mode){
+  var area=document.getElementById(mode==="daily"?"dpArea":"quizArea");
+  updateQProg();
+  if(qIdx>=qPool.length){
+    if(mode==="quiz"||mode==="wb") showSettle(area);
+    else{
+      area.innerHTML="<div class='card' style='text-align:center;padding:22px'>" +
+        "<div style='font-size:1.8rem;margin-bottom:6px'>✅</div>" +
+        "<div style='font-size:0.8rem;letter-spacing:0.2em;margin-bottom:6px'>今日完成！</div>" +
+        "<div style='font-size:0.72rem;color:var(--gold);letter-spacing:0.16em'>今日获得 "+S.dailyEarned+" 趣币 🪙</div></div>";
+    }
+    return;
+  }
+  renderQ(qPool[qIdx++],area,mode);
+}
+function showSettle(area){
+  showQProg(false);
+  var total=qPool.length, acc=total>0?Math.round(qCor/total*100):0;
+  var totalX=qCor*6;
+  var innerR=44, circ=2*Math.PI*innerR, dash=circ*(acc/100);
+  var col=acc>=80?"#2e7d52":acc>=60?"#b8912a":"#c0392b";
+  area.innerHTML="<div class='card settle'>" +
+    "<div style='font-size:0.68rem;letter-spacing:0.28em;color:var(--ink2);margin-bottom:10px'>练习结算</div>"+
+    "<div class='settle-ring'><svg viewBox='0 0 120 120'>" +
+    "<circle cx='60' cy='60' r='44' fill='none' stroke='var(--paper2)' stroke-width='10'/>" +
+    "<circle cx='60' cy='60' r='44' fill='none' stroke='"+col+"' stroke-width='10' stroke-dasharray='"+dash+" "+circ+"' stroke-dashoffset='"+(circ/4)+"' stroke-linecap='round'/>" +
+    "</svg><div class='settle-ring-txt'><div class='settle-pct'>"+acc+"%</div><div class='settle-pct-l'>正确率</div></div></div>" +
+    "<div class='settle-stats'>" +
+    "<div class='ss'><div class='ss-v' style='color:var(--green)'>"+qCor+"</div><div class='ss-l'>答对</div></div>" +
+    "<div class='ss'><div class='ss-v' style='color:var(--seal)'>"+qWrg+"</div><div class='ss-l'>答错</div></div>" +
+    "<div class='ss'><div class='ss-v'>"+total+"</div><div class='ss-l'>共答题</div></div>" +
+    "</div><div class='settle-xubi'>获得趣币 +"+totalX+" 🪙</div>" +
+    (qWrg>0?"<div style='font-size:0.6rem;color:var(--seal);letter-spacing:0.16em;margin-bottom:11px'>"+qWrg+"道错题已加入错题本 📕</div>":"")+
+    "<div class='settle-btns'>" +
+    "<button class='sbtn' style='background:var(--paper2);color:var(--ink2)' id='settleWB'>查看错题本</button>" +
+    "<button class='sbtn' style='background:var(--ink);color:var(--paper)' id='settleAgain'>再来一轮</button>" +
+    "</div></div>";
+  document.getElementById("settleWB").addEventListener("click",function(){navSub("test","test-wrong");initWB();});
+  document.getElementById("settleAgain").addEventListener("click",function(){startQuiz("all");});
+}
+function renderQ(q,container,mode){
+  var tn={fill:"填空题",next:"接下句",author:"猜作者"}[q.type]||"";
+  var tc={fill:"qt-fill",next:"qt-next",author:"qt-auth"}[q.type]||"";
+  var wrap=document.createElement("div"); wrap.className="card";
+  var badge=document.createElement("span"); badge.className="qtype "+tc; badge.textContent=tn;
+  var hint=document.createElement("div"); hint.className="q-hint";
+  hint.textContent="《"+q.title+"》"+q.author;
+  var ques=document.createElement("div"); ques.className="q-ques"; ques.textContent=q.question;
+  wrap.appendChild(badge); wrap.appendChild(hint); wrap.appendChild(ques);
+  if(q.type==="author"&&q.excerpt){
+    var exc=document.createElement("div"); exc.className="q-exc"; exc.textContent=q.excerpt;
+    wrap.appendChild(exc);
+  }
+  var grid=document.createElement("div");
+  grid.className=q.type==="fill"?"q-fill-grid":"q-opts";
+  q.options.forEach(function(opt){
+    var btn=document.createElement("button");
+    btn.className=q.type==="fill"?"qchar":"qopt";
+    btn.textContent=opt;
+    btn.addEventListener("click",function(){handleQ(btn,q,grid,wrap,mode);});
+    grid.appendChild(btn);
+  });
+  wrap.appendChild(grid);
+  var resDiv=document.createElement("div"); resDiv.className="qres";
+  var ri=document.createElement("span"); ri.className="qri";
+  var rm=document.createElement("div"); rm.className="qrm";
+  var rx=document.createElement("div"); rx.className="qrx";
+  var rl=document.createElement("div"); rl.className="qrl";
+  resDiv.appendChild(ri); resDiv.appendChild(rm); resDiv.appendChild(rx); resDiv.appendChild(rl);
+  wrap.appendChild(resDiv);
+  var nxt=document.createElement("button"); nxt.className="q-next"; nxt.textContent="下一题 →";
+  nxt.addEventListener("click",function(){
+    if(mode==="daily"){S.dailyDone=true;S.streak=Math.min(S.streak+1,7);save();initDaily();}
+    else nextQ(mode);
+  });
+  wrap.appendChild(nxt);
+  container.innerHTML=""; container.appendChild(wrap);
+}
+function handleQ(btn,q,grid,wrap,mode){
+  var val=btn.textContent, correct=val===q.answer;
+  grid.querySelectorAll("button").forEach(function(b){
+    b.classList.add("dis");
+    if(b.textContent===q.answer)b.classList.add("cor");
+  });
+  if(!correct)btn.classList.add("wrg");
+  var ri=wrap.querySelector(".qri"), rm=wrap.querySelector(".qrm");
+  var rx=wrap.querySelector(".qrx"), rl=wrap.querySelector(".qrl");
+  var nxt=wrap.querySelector(".q-next");
+  ri.textContent=correct?"🎉":"😢";
+  rm.textContent=correct?"回答正确！":"再想想～正确答案是："+q.answer;
+  if(correct){
+    if(mode==="quiz"||mode==="wb")qCor++;
+    var earned=q.xubi||5;
+    S.xubi+=earned; S.exp+=earned*2; S.totalCorrect++;
+    if(mode==="daily")S.dailyEarned+=earned;
+    rx.textContent="+"+earned+" 趣币 🪙";
+    if(mode==="daily")document.getElementById("dpXubi").textContent="+"+S.dailyEarned;
+    document.getElementById("quizXubi").textContent=S.xubi;
+    S.wrongBook=(S.wrongBook||[]).filter(function(w){return w.qid!==q.id;});
+  } else {
+    rx.textContent="";
+    if(mode==="quiz"||mode==="wb")qWrg++;
+    if(!S.wrongBook)S.wrongBook=[];
+    var ex=S.wrongBook.find(function(w){return w.qid===q.id;});
+    if(ex){ex.count=(ex.count||1)+1;}
+    else{S.wrongBook.push({qid:q.id,type:q.type,title:q.title,author:q.author,
+      question:q.question,answer:q.answer,fullLine:q.fullLine||"",count:1,
+      addedAt:new Date().toLocaleDateString("zh-CN")});}
+  }
+  S.totalAnswered++; updateQProg();
+  if(q.fullLine)rl.textContent=q.fullLine;
+  wrap.querySelector(".qres").classList.add("on");
+  nxt.classList.add("on"); save();
+  if(curPg==="me")renderBird();
+}
+
+// ════ WRONG BOOK ════
+function initWB(){
+  var wb=S.wrongBook||[];
+  document.getElementById("wbCount").textContent="共 "+wb.length+" 道错题";
+  var list=document.getElementById("wbList"); list.innerHTML="";
+  if(!wb.length){
+    var e=document.createElement("div");
+    e.style.cssText="text-align:center;padding:36px;color:var(--ink2);font-size:0.7rem;letter-spacing:0.26em";
+    e.textContent="暂无错题，继续加油！🎉"; list.appendChild(e); return;
+  }
+  wb.slice().sort(function(a,b){return(b.count||1)-(a.count||1);}).forEach(function(w){
+    var div=document.createElement("div"); div.className="wb-item";
+    var tn={fill:"填空题",next:"接下句",author:"猜作者"}[w.type]||"";
+    div.innerHTML=
+      "<div style='display:flex;justify-content:space-between'>" +
+        "<span class='wb-poem'>《"+w.title+"》"+w.author+" · "+tn+"</span>" +
+        "<span class='wb-cnt'>错"+(w.count||1)+"次</span>" +
+      "</div>" +
+      "<div class='wb-ques'>"+w.question+"</div>" +
+      "<div class='wb-ans'>正确答案："+w.answer+"</div>" +
+      (w.fullLine?"<div class='wb-line'>"+w.fullLine+"</div>":"")+
+      "<div class='wb-acts'>" +
+        "<button class='wba' style='background:var(--ink);color:var(--paper)' data-qid='"+w.qid+"'>单独练习</button>" +
+        "<button class='wba' style='border:1px solid rgba(26,16,8,0.2);color:var(--ink2)' data-del='"+w.qid+"'>移除</button>" +
+      "</div>";
+    div.querySelector("[data-qid]").addEventListener("click",function(){
+      var qid=parseInt(this.dataset.qid);
+      var q=QUESTIONS.find(function(x){return x.id===qid;}); if(!q)return;
+      qPool=[q]; qIdx=0; qCor=0; qWrg=0; qMode="wb";
+      navSub("test","test-quiz"); showQProg(false); nextQ("wb");
+    });
+    div.querySelector("[data-del]").addEventListener("click",function(){
+      var qid=parseInt(this.dataset.del);
+      S.wrongBook=(S.wrongBook||[]).filter(function(x){return x.qid!==qid;});
+      save(); initWB(); toast("已移除");
+    });
+    list.appendChild(div);
+  });
+}
+
+// ════ RECITE ════
+// ── Speech Recognition wrapper ──
+var SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+
+// ── Text scoring helpers ──
+function cleanText(s){
+  return s.replace(/[，。？！、：；""''《》\s]/g,"");
+}
+function calcSimilarity(a, b){
+  // character-level matching ratio
+  a = cleanText(a); b = cleanText(b);
+  if(!a.length || !b.length) return 0;
+  var matches = 0;
+  var bArr = b.split("");
+  a.split("").forEach(function(ch){
+    var i = bArr.indexOf(ch);
+    if(i >= 0){ matches++; bArr.splice(i,1); }
+  });
+  return Math.round(matches / Math.max(a.length, b.length) * 100);
+}
+function scorePronunciation(recognized, expected){
+  // Tone marks not available from Web Speech, proxy via char match
+  return calcSimilarity(recognized, expected);
+}
+function scoreFluency(recognized, durationSec, expected){
+  // chars per second vs expected pace (2-4 chars/sec is natural)
+  var chars = cleanText(recognized).length;
+  var cps = durationSec > 0 ? chars / durationSec : 0;
+  var pace = Math.min(cps / 3.5, 1); // 3.5 cps = 100
+  var completeness = calcSimilarity(recognized, expected);
+  return Math.round((pace * 40 + completeness * 0.6));
+}
+
+// ── Show per-char diff ──
+function renderDiff(recognized, expected){
+  var expChars = cleanText(expected).split("");
+  var recChars = cleanText(recognized).split("");
+  var html = "";
+  expChars.forEach(function(ch){
+    var idx = recChars.indexOf(ch);
+    if(idx >= 0){
+      html += "<span style='color:var(--green)'>" + ch + "</span>";
+      recChars.splice(idx, 1);
+    } else {
+      html += "<span style='color:var(--seal);text-decoration:underline'>" + ch + "</span>";
+    }
+  });
+  return html;
+}
+
+// ── State ──
+var curRecPoem = null;      // poem being recorded
+var curRecDiv  = null;      // DOM container
+var curRecognizer = null;   // SpeechRecognition instance
+var recStartTime = 0;
+var recTranscript = "";     // accumulated transcript
+var recActive = false;
+
+function initRec(highlightId){
+  var list = document.getElementById("recList");
+  list.innerHTML = "";
+
+  // Browser support check
+  if(!SpeechRec){
+    list.innerHTML = "<div class='card' style='text-align:center;padding:28px'>" +
+      "<div style='font-size:1.8rem;margin-bottom:8px'>😢</div>" +
+      "<div style='font-size:0.75rem;color:var(--ink2);letter-spacing:0.16em;line-height:1.8'>" +
+      "您的浏览器不支持 Web Speech API<br>" +
+      "请使用 Chrome / Edge 浏览器（桌面版）<br>" +
+      "或 Safari（iOS 14.5+）</div></div>";
+    return;
+  }
+
+  var picks = highlightId
+    ? [POEMS.find(function(p){return p.id===highlightId;})].concat(
+        POEMS.filter(function(p){return p.id!==highlightId;}).slice(0,8))
+    : POEMS.slice(0,12);
+
+  picks.filter(Boolean).forEach(function(p){
+    var div = document.createElement("div");
+    div.className = "rec-poem";
+    div.dataset.poemId = p.id;
+
+    // Title
+    var title = document.createElement("div");
+    title.className = "rec-title";
+    title.textContent = "《" + p.title + "》" + p.author;
+    div.appendChild(title);
+
+    // Full text (expected)
+    var fullText = p.lines.map(function(l){return l.text;}).join("");
+    var linesText = p.lines.map(function(l){return l.text;}).join("\n");
+
+    // Show poem lines
+    var linesEl = document.createElement("div");
+    linesEl.className = "rec-lines";
+    linesEl.textContent = linesText;
+    div.appendChild(linesEl);
+
+    // Live transcript display
+    var transcriptEl = document.createElement("div");
+    transcriptEl.style.cssText =
+      "min-height:28px;margin:8px 0 4px;padding:7px 10px;" +
+      "background:rgba(46,125,82,0.06);border:1px dashed rgba(46,125,82,0.25);" +
+      "font-size:0.8rem;letter-spacing:0.12em;color:var(--ink2);display:none;" +
+      "line-height:1.7;";
+    transcriptEl.id = "transcript_" + p.id;
+    div.appendChild(transcriptEl);
+
+    // Start/Stop button
+    var btn = document.createElement("button");
+    btn.className = "rec-btn rec-start";
+    btn.textContent = "🎤 开始朗读";
+    div.appendChild(btn);
+
+    // Scores panel
+    var scores = document.createElement("div");
+    scores.className = "rec-scores";
+    scores.innerHTML =
+      "<div class='rec-big'>" +
+        "<span class='rec-num' id='rn_" + p.id + "'>—</span>" +
+        "<div class='rec-numl'>综合评分</div>" +
+      "</div>" +
+      "<div class='srow'><span class='srow-l'>完整度</span>" +
+        "<div class='sbg'><div class='sfill' id='sp_" + p.id + "' style='width:0%'></div></div>" +
+        "<span class='snv' id='sv_p_" + p.id + "'>0</span></div>" +
+      "<div class='srow'><span class='srow-l'>流利度</span>" +
+        "<div class='sbg'><div class='sfill' id='sf_" + p.id + "' style='width:0%'></div></div>" +
+        "<span class='snv' id='sv_f_" + p.id + "'>0</span></div>" +
+      "<div class='srow'><span class='srow-l'>准确度</span>" +
+        "<div class='sbg'><div class='sfill' id='sc_" + p.id + "' style='width:0%'></div></div>" +
+        "<span class='snv' id='sv_c_" + p.id + "'>0</span></div>" +
+      "<div style='margin-top:9px;font-size:0.62rem;color:var(--ink2);" +
+        "letter-spacing:0.12em;line-height:1.8' id='diff_" + p.id + "'></div>" +
+      "<div class='rec-xubi' id='rx_" + p.id + "'></div>";
+    div.appendChild(scores);
+
+    btn.addEventListener("click", function(){
+      if(!recActive){
+        startRecognition(p, btn, transcriptEl, scores, fullText);
+      } else if(curRecPoem && curRecPoem.id === p.id){
+        stopRecognition(true);
+      } else {
+        toast("请先停止当前朗读");
+      }
+    });
+
+    list.appendChild(div);
+    if(p.id === highlightId){
+      setTimeout(function(){div.scrollIntoView({behavior:"smooth",block:"start"});},100);
+    }
+  });
+}
+
+function startRecognition(poem, btn, transcriptEl, scores, fullText){
+  if(curRecognizer){
+    try{ curRecognizer.stop(); }catch(e){}
+    curRecognizer = null;
+  }
+
+  curRecPoem    = poem;
+  curRecDiv     = {btn:btn, transcriptEl:transcriptEl, scores:scores, fullText:fullText};
+  recTranscript = "";
+  recStartTime  = Date.now();
+  recActive     = true;
+
+  btn.textContent  = "⏹ 停止朗读";
+  btn.className    = "rec-btn rec-stop";
+  transcriptEl.style.display = "block";
+  transcriptEl.textContent   = "正在聆听…";
+  scores.classList.remove("on");
+
+  var rec = new SpeechRec();
+  curRecognizer = rec;
+  rec.lang          = "zh-CN";
+  rec.continuous    = true;
+  rec.interimResults= true;
+  rec.maxAlternatives = 1;
+
+  rec.onstart = function(){
+    toast("🎤 开始录音，请朗读诗句…");
+  };
+
+  rec.onresult = function(e){
+    var interim = "", final = "";
+    for(var i = e.resultIndex; i < e.results.length; i++){
+      var t = e.results[i][0].transcript;
+      if(e.results[i].isFinal) final += t;
+      else interim += t;
+    }
+    if(final) recTranscript += final;
+    transcriptEl.textContent = (recTranscript + interim) || "正在聆听…";
+  };
+
+  rec.onerror = function(e){
+    var msgs = {
+      "not-allowed":  "麦克风权限被拒绝，请在浏览器设置中允许麦克风",
+      "no-speech":    "未检测到语音，请靠近麦克风后重试",
+      "network":      "网络错误，Web Speech API 需要联网",
+      "audio-capture":"未找到麦克风设备"
+    };
+    toast(msgs[e.error] || ("语音识别错误：" + e.error));
+    resetRecBtn(btn);
+    recActive = false;
+  };
+
+  rec.onend = function(){
+    // Called when recognition stops (either by user or timeout)
+    if(recActive){
+      // If still active, means it stopped naturally — finalize
+      recActive = false;
+      var duration = (Date.now() - recStartTime) / 1000;
+      showRecResult(poem, btn, transcriptEl, scores, fullText, recTranscript, duration);
+    }
+  };
+
+  try{
+    rec.start();
+  } catch(e){
+    toast("无法启动语音识别，请使用 Chrome 浏览器");
+    resetRecBtn(btn); recActive = false;
+  }
+}
+
+function stopRecognition(finalize){
+  recActive = false;
+  if(curRecognizer){
+    try{ curRecognizer.stop(); }catch(e){}
+    // onend will fire and call showRecResult
+  }
+}
+
+function resetRecBtn(btn){
+  btn.textContent = "🎤 开始朗读";
+  btn.className   = "rec-btn rec-start";
+}
+
+function showRecResult(poem, btn, transcriptEl, scores, fullText, transcript, duration){
+  resetRecBtn(btn);
+  transcriptEl.style.display = "block";
+
+  if(!transcript || transcript.trim().length < 2){
+    transcriptEl.textContent = "未识别到有效语音，请重试";
+    return;
+  }
+
+  // ── Calculate scores ──
+  var completeness = calcSimilarity(transcript, fullText);
+  var accuracy     = scorePronunciation(transcript, fullText);
+  var fluency      = Math.min(100, Math.round(
+    (duration > 0 ? Math.min(cleanText(transcript).length / duration / 3.5, 1) : 0.5) * 40
+    + completeness * 0.6
+  ));
+  var total = Math.round((completeness * 0.45 + accuracy * 0.35 + fluency * 0.2));
+  total = Math.max(10, Math.min(100, total));
+
+  var earned = Math.round(total / 10);
+
+  // Show transcript with diff highlighting
+  transcriptEl.innerHTML =
+    "<span style='font-size:0.55rem;color:var(--ink2);letter-spacing:0.2em;" +
+    "display:block;margin-bottom:4px'>识别结果：</span>" +
+    renderDiff(transcript, fullText);
+
+  // Animate scores
+  scores.classList.add("on");
+  document.getElementById("rn_" + poem.id).textContent = total;
+  setTimeout(function(){
+    document.getElementById("sp_" + poem.id).style.width = completeness + "%";
+    document.getElementById("sv_p_" + poem.id).textContent = completeness;
+    document.getElementById("sf_" + poem.id).style.width = fluency + "%";
+    document.getElementById("sv_f_" + poem.id).textContent = fluency;
+    document.getElementById("sc_" + poem.id).style.width = accuracy + "%";
+    document.getElementById("sv_c_" + poem.id).textContent = accuracy;
+  }, 80);
+
+  // Diff detail
+  var missedChars = cleanText(fullText).split("").filter(function(ch){
+    return cleanText(transcript).indexOf(ch) < 0;
+  });
+  var diffMsg = "";
+  if(missedChars.length > 0 && missedChars.length <= 8){
+    diffMsg = "漏读字：" + missedChars.join("、");
+  } else if(completeness >= 90){
+    diffMsg = "🎉 朗读非常完整！";
+  }
+  document.getElementById("diff_" + poem.id).innerHTML =
+    (diffMsg ? "<span style='color:var(--seal);font-size:0.6rem;letter-spacing:0.12em'>" + diffMsg + "</span>" : "") +
+    "<br><span style='font-size:0.58rem;color:var(--ink2)'>原文：" + fullText + "</span>";
+
+  // Save & reward
+  S.xubi += earned; S.exp += earned; S.totalAnswered++; save();
+  document.getElementById("rx_" + poem.id).textContent = "获得 +" + earned + " 趣币 🪙";
+  toast("朗读完成！得分 " + total + " · 获得 +" + earned + " 趣币");
+  if(curPg === "me") renderBird();
+}
+
+// ════ RANK ════
+var CLS=[
+  {name:"小明",av:"👦",score:1240,exp:520},{name:"小红",av:"👧",score:980,exp:380},
+  {name:"我",  av:"🐦",score:0,  exp:0,  me:true},
+  {name:"小刚",av:"👦",score:750,exp:280},{name:"小美",av:"👧",score:680,exp:240},
+  {name:"小强",av:"👦",score:520,exp:190},{name:"小丽",av:"👧",score:430,exp:140},
+  {name:"小军",av:"👦",score:310,exp:100},{name:"小花",av:"👧",score:200,exp:60},
+  {name:"小虎",av:"👦",score:120,exp:30}
+];
+function renderRank(){
+  CLS.forEach(function(c){if(c.me){c.score=S.xubi;c.exp=S.exp;}});
+  var sorted=CLS.slice().sort(function(a,b){return b.score-a.score;});
+  var list=document.getElementById("rankList"); list.innerHTML="";
+  sorted.forEach(function(c,i){
+    var rk=i+1, rs=rk<=3?["🥇","🥈","🥉"][rk-1]:rk;
+    var rc=rk===1?"g":rk===2?"s":rk===3?"b":"";
+    var r=getRank(c.exp);
+    var row=document.createElement("div"); row.className="lb-row"+(c.me?" me":"");
+    row.innerHTML="<div class='lb-rk "+rc+"'>"+rs+"</div>" +
+      "<div class='lb-nm'><div class='lb-av'>"+c.av+"</div>"+c.name+(c.me?" 👈":"")+"</div>" +
+      "<div class='lb-sc'>"+c.score+" 🪙</div>" +
+      "<div class='lb-sc'><span class='lb-bd' style='background:"+r.color+"'>"+r.name+"</span></div>";
+    list.appendChild(row);
+  });
+  var acc=S.totalAnswered>0?Math.round(S.totalCorrect/S.totalAnswered*100):0;
+  document.getElementById("myStats").innerHTML=
+    "<div class='sgc'><span class='sgc-i'>🪙</span><div class='sgc-v' style='color:var(--gold)'>"+S.xubi+"</div><div class='sgc-l'>趣币</div></div>"+
+    "<div class='sgc'><span class='sgc-i'>⭐</span><div class='sgc-v'>"+S.exp+"</div><div class='sgc-l'>经验值</div></div>"+
+    "<div class='sgc'><span class='sgc-i'>✅</span><div class='sgc-v' style='color:var(--green)'>"+acc+"%</div><div class='sgc-l'>正确率</div></div>"+
+    "<div class='sgc'><span class='sgc-i'>🔥</span><div class='sgc-v' style='color:var(--seal)'>"+S.streak+"</div><div class='sgc-l'>连续打卡</div></div>";
+}
+
+// ════ BIRD ════
+function renderBird(){
+  var r=getRank(S.exp), nr=getNext(S.exp);
+  var expIn=S.exp-r.min, expNeed=(nr?nr.min:r.max)-r.min;
+  var pct=Math.min(100,Math.round(expIn/expNeed*100));
+  document.getElementById("birdXubi").textContent=S.xubi;
+  document.getElementById("birdLv").textContent=r.name+" · Lv."+(Math.floor(S.exp/50)+1);
+  var rb=document.getElementById("rankBig"); rb.textContent=r.name; rb.style.background=r.color;
+  document.getElementById("expFill").style.width=pct+"%";
+  document.getElementById("expLbl").textContent=S.exp+" / "+(nr?nr.min:r.max);
+  document.getElementById("curRankLbl").textContent=r.name;
+  document.getElementById("nextRankLbl").textContent=nr?"→ "+nr.name:"已达最高段位";
+  document.getElementById("costumeLayer").innerHTML=CO_SVG[S.costume]||"";
+  var grid=document.getElementById("coGrid"); grid.innerHTML="";
+  COSTUMES.forEach(function(co){
+    var owned=S.owned.indexOf(co.id)>=0, equipped=S.costume===co.id;
+    var div=document.createElement("div");
+    div.className="co"+(equipped?" equipped":owned?" owned":" locked");
+    div.innerHTML="<span class='co-icon'>"+co.icon+"</span>" +
+      "<span class='co-name'>"+co.name+"</span>" +
+      "<span class='co-price'>"+(owned?(equipped?"已装备":"已拥有"):co.price+"趣币")+"</span>";
+    div.addEventListener("click",function(){
+      if(equipped)return;
+      if(owned){S.costume=co.id;save();renderBird();toast("已换上"+co.name+"！");}
+      else if(S.xubi>=co.price){S.xubi-=co.price;S.owned.push(co.id);S.costume=co.id;save();renderBird();toast("购买成功！已换上"+co.name+" 🎉");}
+      else toast("趣币不足，继续答题赚取趣币吧～");
+    });
+    grid.appendChild(div);
+  });
+}
+
+// ════ AI CREATE ════
+var AI_POETS=[
+  {id:"libai",   name:"李白",  dynasty:"唐", style:"豪放飘逸",
+   prompt:"你是唐代大诗人李白，风格豪放浪漫，善用夸张比喻，喜以仙、月、酒、山水入诗，气势磅礴，充满想象力。"},
+  {id:"dufu",    name:"杜甫",  dynasty:"唐", style:"沉郁顿挫",
+   prompt:"你是唐代大诗人杜甫，风格沉郁顿挫，忧国忧民，善写现实，用字精炼，情感深沉厚重。"},
+  {id:"wangwei", name:"王维",  dynasty:"唐", style:"禅意空灵",
+   prompt:"你是唐代诗人王维，兼修佛法，诗中有画，风格清幽空灵，善写山水田园，意境深远禅静。"},
+  {id:"qingzhao",name:"李清照",dynasty:"宋", style:"婉约细腻",
+   prompt:"你是宋代女词人李清照，风格婉约细腻，善写闺情、离愁、自然之美，语言清丽典雅，情感真挚动人。"},
+  {id:"dongpo",  name:"苏轼",  dynasty:"宋", style:"豪迈旷达",
+   prompt:"你是宋代文豪苏轼，风格豪迈旷达，博学多才，善以哲理入诗词，笔墨洒脱，人生态度乐观超然。"},
+  {id:"yufei",   name:"岳飞",  dynasty:"宋", style:"慷慨激昂",
+   prompt:"你是宋代名将岳飞，诗词风格慷慨激昂，充满家国情怀，气吞山河，壮志凌云。"}
+];
+var AI_SCENES=[
+  {id:"spring",   icon:"🌸",text:"春日踏青"},{id:"moon",    icon:"🌕",text:"月夜思乡"},
+  {id:"rain",     icon:"🌧",text:"秋雨登楼"},{id:"farewell",icon:"🛶",text:"送别友人"},
+  {id:"snow",     icon:"❄", text:"冬雪独酌"},{id:"mountain",icon:"⛰",text:"登高望远"},
+  {id:"river",    icon:"🌊",text:"江上泛舟"},{id:"war",     icon:"🏹",text:"边塞征途"}
+];
+var AI_TONES=["豪迈","婉约","清新","悲凉","旷达","禅意","激昂","惆怅"];
+var aiPoet=null, aiScene=null, aiTone="清新";
+var aiHistory=JSON.parse(localStorage.getItem("sjxt_ai")||"[]");
+
+function initAI(){
+  renderPoetGrid(); renderSceneGrid(); renderToneRow(); renderAIHist();
+  document.getElementById("aiGenBtn").onclick=genPoem;
+}
+function renderPoetGrid(){
+  var g=document.getElementById("poetGrid"); g.innerHTML="";
+  AI_POETS.forEach(function(p){
+    var b=document.createElement("button");
+    b.className="poet-btn"+(aiPoet&&aiPoet.id===p.id?" on":"");
+    b.innerHTML="<span class='pb-name'>"+p.name+"</span><span class='pb-style'>"+p.dynasty+"·"+p.style+"</span>";
+    b.addEventListener("click",function(){
+      aiPoet=p; g.querySelectorAll(".poet-btn").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
+    });
+    g.appendChild(b);
+  });
+}
+function renderSceneGrid(){
+  var g=document.getElementById("sceneGrid"); g.innerHTML="";
+  AI_SCENES.forEach(function(s){
+    var b=document.createElement("button");
+    b.className="scene-btn"+(aiScene&&aiScene.id===s.id?" on":"");
+    b.innerHTML="<span class='sc-icon'>"+s.icon+"</span><span class='sc-text'>"+s.text+"</span>";
+    b.addEventListener("click",function(){
+      aiScene=s; g.querySelectorAll(".scene-btn").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
+    });
+    g.appendChild(b);
+  });
+}
+function renderToneRow(){
+  var r=document.getElementById("toneRow"); r.innerHTML="";
+  AI_TONES.forEach(function(t){
+    var b=document.createElement("button");
+    b.className="tone-btn"+(t===aiTone?" on":""); b.textContent=t;
+    b.addEventListener("click",function(){
+      aiTone=t; r.querySelectorAll(".tone-btn").forEach(function(x){x.classList.remove("on");}); b.classList.add("on");
+    });
+    r.appendChild(b);
+  });
+}
+function renderAIHist(){
+  var sec=document.getElementById("aiHistSec"), list=document.getElementById("aiHistList");
+  if(!aiHistory.length){sec.style.display="none";return;}
+  sec.style.display="block"; list.innerHTML="";
+  aiHistory.slice().reverse().forEach(function(item){
+    var div=document.createElement("div"); div.className="ai-hist-item";
+    div.innerHTML="<div class='ai-hist-t'>《"+item.title+"》</div>" +
+      "<div class='ai-hist-m'>"+item.poetName+" · "+item.scene+" · "+item.createdAt+"</div>";
+    div.addEventListener("click",function(){showAIPoem(item);});
+    list.appendChild(div);
+  });
+}
+async function genPoem(){
+  if(!aiPoet){toast("请先选择一位诗人 🖌");return;}
+  if(!aiScene){toast("请选择创作场景 🎋");return;}
+  var extra=document.getElementById("aiExtra").value.trim();
+  var btn=document.getElementById("aiGenBtn"), loading=document.getElementById("aiLoading");
+  var result=document.getElementById("aiResult");
+  btn.disabled=true; loading.classList.add("on");
+  result.classList.remove("on"); result.innerHTML="";
+  var sys=aiPoet.prompt+
+    "\n\n请以你的风格创作一首诗词。要求：" +
+    "\n1. 输出严格JSON格式，不要有任何其他文字" +
+    "\n2. JSON包含：title(诗题), body(诗文，用\\n分隔诗句), notes(50字以内的创作说明)" +
+    "\n3. 诗文要有古典意境，字数适中（20-40字），平仄押韵" +
+    "\n4. 只输出JSON，不要markdown代码块";
+  var usr="场景："+aiScene.text+"。基调："+aiTone+"。"+(extra?"补充要求："+extra:"")+"\n\n请以"+aiPoet.name+"的口吻和风格创作一首诗，输出JSON。";
+  try{
+    var resp=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:sys,messages:[{role:"user",content:usr}]})
+    });
+    var data=await resp.json();
+    var raw=(data.content&&data.content[0]&&data.content[0].text)||"";
+    var poem;
+    try{poem=JSON.parse(raw.replace(/```json|```/g,"").trim());}
+    catch(e){poem={title:aiScene.text+"·"+aiPoet.name+"风",body:raw,notes:"以"+aiPoet.name+"风格创作"};}
+    var rec={title:poem.title||"无题",body:poem.body||"",notes:poem.notes||"",
+      poetId:aiPoet.id,poetName:aiPoet.name,scene:aiScene.text,tone:aiTone,
+      createdAt:new Date().toLocaleDateString("zh-CN")};
+    aiHistory.push(rec); localStorage.setItem("sjxt_ai",JSON.stringify(aiHistory.slice(-20)));
+    loading.classList.remove("on"); showAIPoem(rec); renderAIHist();
+  }catch(err){
+    loading.classList.remove("on");
+    result.classList.add("on");
+    result.innerHTML="<div class='card' style='text-align:center;padding:22px'>" +
+      "<div style='font-size:1.5rem;margin-bottom:6px'>😢</div>" +
+      "<div style='font-size:0.7rem;color:var(--ink2);letter-spacing:0.16em'>创作失败，请检查网络后重试</div></div>";
+    toast("网络错误，请重试");
+  }
+  btn.disabled=false;
+}
+function showAIPoem(rec){
+  var loading=document.getElementById("aiLoading"); loading.classList.remove("on");
+  var result=document.getElementById("aiResult");
+  var lines=(rec.body||"").split("\n").filter(function(l){return l.trim();}).join("\n");
+  result.innerHTML="<div class='ai-poem-card'>" +
+    "<div class='ai-pt'>《"+(rec.title||"无题")+"》</div>" +
+    "<div class='ai-pm'>仿"+rec.poetName+" · "+rec.scene+" · "+rec.tone+"</div>" +
+    "<div class='ai-pb'>"+lines+"</div>" +
+    (rec.notes?"<div class='ai-pn'>创作说明："+rec.notes+"</div>":"")+
+    "</div>" +
+    "<div class='ai-acts'>" +
+    "<button class='ai-act' style='background:var(--paper2);color:var(--ink2)' id='aiCopy'>📋 复制</button>" +
+    "<button class='ai-act' style='background:var(--seal);color:#f7f2e8' id='aiAgain'>✨ 再创一首</button>" +
+    "</div>";
+  result.classList.add("on");
+  document.getElementById("aiCopy").addEventListener("click",function(){
+    var txt="《"+rec.title+"》\n"+(rec.body||"")+"\n—— 仿"+rec.poetName+"风格";
+    if(navigator.clipboard)navigator.clipboard.writeText(txt).then(function(){toast("已复制 📋");});
+    else toast("请手动长按复制");
+  });
+  document.getElementById("aiAgain").addEventListener("click",function(){
+    result.classList.remove("on"); result.innerHTML="";
+    document.getElementById("aiExtra").value=""; genPoem();
+  });
+}
+
+
+
+
+// ════ POET CALL ════
+// Poet data: name, dynasty, style, Wikimedia portrait URL, bgKeyword
+var POETS_DATA = [
+  {name:"李白", dynasty:"唐", style:"豪放飘逸",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Li_Bai_Tang_Dynasty.jpg/320px-Li_Bai_Tang_Dynasty.jpg",
+   bg:"#1a2008",
+   prompt:"你是唐代大诗人李白，风格豪放浪漫，善用夸张比喻，喜以仙、月、酒、山水入诗，气势磅礴，充满想象力。",
+   gender:"male"},
+  {name:"杜甫", dynasty:"唐", style:"沉郁顿挫",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Portrait_of_Du_Fu.jpg/320px-Portrait_of_Du_Fu.jpg",
+   bg:"#1a0e08",
+   prompt:"你是唐代大诗人杜甫，风格沉郁顿挫，忧国忧民，善写现实，用字精炼，情感深沉厚重。",
+   gender:"male"},
+  {name:"王维", dynasty:"唐", style:"禅意空灵",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Wang_Wei_%28Tang_Dynasty%29.jpg/320px-Wang_Wei_%28Tang_Dynasty%29.jpg",
+   bg:"#081a10",
+   prompt:"你是唐代诗人王维，兼修佛法，诗中有画，风格清幽空灵，善写山水田园，意境深远禅静。",
+   gender:"male"},
+  {name:"李清照", dynasty:"宋", style:"婉约细腻",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Li_Qingzhao.jpg/320px-Li_Qingzhao.jpg",
+   bg:"#1a0815",
+   prompt:"你是宋代女词人李清照，风格婉约细腻，善写闺情、离愁、自然之美，语言清丽典雅，情感真挚动人。",
+   gender:"female"},
+  {name:"苏轼", dynasty:"宋", style:"豪迈旷达",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Su_Dongpo_by_Song_Luo.jpg/320px-Su_Dongpo_by_Song_Luo.jpg",
+   bg:"#08121a",
+   prompt:"你是宋代文豪苏轼，风格豪迈旷达，博学多才，善以哲理入诗词，笔墨洒脱，人生态度乐观超然。",
+   gender:"male"},
+  {name:"岳飞", dynasty:"宋", style:"慷慨激昂",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Yue_Fei_portrait.jpg/320px-Yue_Fei_portrait.jpg",
+   bg:"#1a0808",
+   prompt:"你是宋代名将岳飞，诗词风格慷慨激昂，充满家国情怀，气吞山河，壮志凌云。",
+   gender:"male"},
+  {name:"白居易", dynasty:"唐", style:"平易近人",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Bai_Juyi.jpg/320px-Bai_Juyi.jpg",
+   bg:"#0a0a1a",
+   prompt:"你是唐代诗人白居易，诗风平易近人，关注民间疾苦，语言通俗明快，情感真挚，雅俗共赏。",
+   gender:"male"},
+  {name:"陆游", dynasty:"宋", style:"爱国深情",
+   img:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Lu_You.jpg/320px-Lu_You.jpg",
+   bg:"#0d1a08",
+   prompt:"你是宋代诗人陆游，一生心系国家统一，诗风沉雄豪放，爱国深情贯穿始终，晚年尤为感人。",
+   gender:"male"}
+];
+
+var callPoem    = null;
+var callHistory = [];
+var callBusy    = false;
+var callActive  = false;
+var callSeconds = 0;
+var callTimerInterval = null;
+var callMuted   = false;
+var callAudio   = null;
+var callCurrentPoet = null;  // poet data object
+
+var CALL_QUESTIONS = [
+  "你为何写这首诗？",
+  "当时心境如何？",
+  "哪句最得意？",
+  "这首诗的背景？",
+  "有何人生感悟？"
+];
+
+// ── Guqin audio using Web Audio API ──
+// ── Audio Engine ──
+var audioCtx = null;
+var bgAmbientNode = null;   // background ambient during call
+var bgAmbientGain = null;
+
+function getAudioCtx() {
+  if(!audioCtx || audioCtx.state === 'closed') {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// ── Master reverb (simple convolver) ──
+function makeReverb(ctx, duration, decay) {
+  var rate = ctx.sampleRate;
+  var len  = rate * duration;
+  var buf  = ctx.createBuffer(2, len, rate);
+  for(var ch = 0; ch < 2; ch++) {
+    var d = buf.getChannelData(ch);
+    for(var i = 0; i < len; i++) {
+      d[i] = (Math.random()*2 - 1) * Math.pow(1 - i/len, decay);
+    }
+  }
+  var conv = ctx.createConvolver();
+  conv.buffer = buf;
+  return conv;
+}
+
+// ── Pluck a guqin string ──
+function pluck(ctx, dest, freq, t, vol, dur) {
+  vol = vol || 0.2; dur = dur || 1.4;
+  var osc  = ctx.createOscillator();
+  var osc2 = ctx.createOscillator();
+  var gain = ctx.createGain();
+  osc.type  = 'triangle'; osc.frequency.value  = freq;
+  osc2.type = 'sine';     osc2.frequency.value = freq * 2.01;
+  var g2 = ctx.createGain(); g2.gain.value = 0.15;
+  osc2.connect(g2); g2.connect(gain);
+  osc.connect(gain); gain.connect(dest);
+  gain.gain.setValueAtTime(0, t);
+  gain.gain.linearRampToValueAtTime(vol, t + 0.008);
+  gain.gain.exponentialRampToValueAtTime(vol * 0.4, t + 0.06);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  osc.start(t);  osc.stop(t + dur + 0.1);
+  osc2.start(t); osc2.stop(t + dur + 0.1);
+}
+
+function playGuqin(type) {
+  try {
+    var ctx = getAudioCtx();
+    var rev = makeReverb(ctx, 1.8, 3.5);
+    rev.connect(ctx.destination);
+    var dry = ctx.destination;
+
+    if(type === 'ring') {
+      // 拨号 — 五声音阶拨弦，重复两次
+      // 宫商角徵羽: C D E G A  (261 293 329 392 440)
+      var scale = [392, 440, 523, 392, 329, 261, 329, 392];
+      var pattern = [0, 0.45, 0.85, 1.25, 1.6, 2.0, 2.35, 2.75];
+      scale.forEach(function(f, i) {
+        pluck(ctx, rev, f, ctx.currentTime + pattern[i], 0.22, 1.6);
+        pluck(ctx, dry, f, ctx.currentTime + pattern[i], 0.07, 1.6);
+      });
+      // Second pass softer
+      scale.forEach(function(f, i) {
+        pluck(ctx, rev, f, ctx.currentTime + pattern[i] + 3.2, 0.14, 1.6);
+      });
+
+    } else if(type === 'connect') {
+      // 接通 — 清脆钟声 + 和弦
+      // Bell-like tone
+      [523, 659, 784, 1047].forEach(function(f, i) {
+        var o = ctx.createOscillator();
+        var g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = f;
+        o.connect(g); g.connect(rev);
+        var t0 = ctx.currentTime + i * 0.08;
+        g.gain.setValueAtTime(0.18, t0);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + 2.5);
+        o.start(t0); o.stop(t0 + 2.6);
+      });
+      // Warm guqin chord
+      [261, 329, 392].forEach(function(f) {
+        pluck(ctx, rev, f, ctx.currentTime + 0.3, 0.18, 2.5);
+      });
+
+    } else if(type === 'hangup') {
+      // 挂断 — 低沉下滑音
+      var o = ctx.createOscillator();
+      var g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(392, ctx.currentTime);
+      o.frequency.exponentialRampToValueAtTime(130, ctx.currentTime + 0.5);
+      o.connect(g); g.connect(ctx.destination);
+      g.gain.setValueAtTime(0.2, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
+      o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.55);
+      // Second gentle pluck
+      setTimeout(function(){
+        try { pluck(getAudioCtx(), getAudioCtx().destination, 261, getAudioCtx().currentTime, 0.1, 1.0); } catch(e){}
+      }, 200);
+
+    } else if(type === 'bgStart') {
+      // 通话中背景 — 轻柔的古琴拨弦循环
+      startBgAmbient(ctx);
+
+    } else if(type === 'bgStop') {
+      stopBgAmbient();
+
+    } else if(type === 'send') {
+      // 发送消息音 — 轻拨一弦
+      pluck(ctx, rev, 523, ctx.currentTime, 0.1, 0.8);
+
+    } else if(type === 'receive') {
+      // 收到消息音 — 两声轻拨
+      pluck(ctx, rev, 659, ctx.currentTime,        0.1, 0.8);
+      pluck(ctx, rev, 784, ctx.currentTime + 0.15, 0.08, 0.8);
+    }
+  } catch(e) { /* silent fail */ }
+}
+
+function startBgAmbient(ctx) {
+  stopBgAmbient();
+  // Gentle repeating pentatonic arpeggio every 4 seconds
+  var notes = [261, 329, 392, 523, 392, 329];
+  var timing = [0, 0.6, 1.1, 1.65, 2.2, 2.75];
+  var rev2 = makeReverb(ctx, 2.5, 4);
+  rev2.connect(ctx.destination);
+
+  var masterGain = ctx.createGain();
+  masterGain.gain.value = 0.55;
+  masterGain.connect(rev2);
+  bgAmbientGain = masterGain;
+
+  var intervalId = null;
+  var playLoop = function() {
+    if(!bgAmbientGain) return;
+    try {
+      var c2 = getAudioCtx();
+      notes.forEach(function(f, i) {
+        pluck(c2, masterGain, f, c2.currentTime + timing[i], 0.18, 2.0);
+      });
+    } catch(e) {}
+  };
+  playLoop();
+  intervalId = setInterval(playLoop, 4000);
+  bgAmbientNode = { stop: function(){ clearInterval(intervalId); } };
+}
+
+function stopBgAmbient() {
+  if(bgAmbientNode) {
+    bgAmbientNode.stop();
+    bgAmbientNode = null;
+  }
+  if(bgAmbientGain) {
+    try {
+      bgAmbientGain.gain.setValueAtTime(bgAmbientGain.gain.value, getAudioCtx().currentTime);
+      bgAmbientGain.gain.exponentialRampToValueAtTime(0.0001, getAudioCtx().currentTime + 0.8);
+    } catch(e) {}
+    bgAmbientGain = null;
+  }
+}
+
+
+// ── TTS: 诗人朗读 ──
+var ttsSpeaking = false;
+
+function speakPoetReply(text, gender) {
+  if(!window.speechSynthesis) return;
+  // Stop any current speech
+  window.speechSynthesis.cancel();
+
+  var utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "zh-CN";
+  utter.rate = 0.88;   // slightly slower for classical feel
+  utter.pitch = gender === "female" ? 1.25 : 0.82;
+  utter.volume = 0.95;
+
+  // Try to pick a Chinese voice matching gender
+  function trySpeak() {
+    var voices = window.speechSynthesis.getVoices();
+    var zhVoices = voices.filter(function(v) {
+      return v.lang && (v.lang.indexOf("zh") === 0 || v.lang.indexOf("cmn") === 0);
+    });
+
+    if(zhVoices.length > 0) {
+      // Sort: prefer local voices, then match gender by name heuristic
+      zhVoices.sort(function(a, b) { return (b.localService ? 1 : 0) - (a.localService ? 1 : 0); });
+
+      var picked = null;
+      if(gender === "female") {
+        // Look for female voice keywords
+        picked = zhVoices.find(function(v) {
+          var n = (v.name || "").toLowerCase();
+          return n.indexOf("female") >= 0 || n.indexOf("woman") >= 0 ||
+                 n.indexOf("xiaoxiao") >= 0 || n.indexOf("xiaoyi") >= 0 ||
+                 n.indexOf("yunxi") >= 0 || n.indexOf("tingting") >= 0 ||
+                 n.indexOf("meijia") >= 0 || n.indexOf("hanhan") >= 0 ||
+                 n.indexOf("f ") >= 0 || n.match(/\bf\b/);
+        });
+      } else {
+        // Look for male voice keywords
+        picked = zhVoices.find(function(v) {
+          var n = (v.name || "").toLowerCase();
+          return n.indexOf("male") >= 0 || n.indexOf("man") >= 0 ||
+                 n.indexOf("yunyang") >= 0 || n.indexOf("kangkang") >= 0 ||
+                 n.indexOf("yunjian") >= 0 || n.indexOf("m ") >= 0 ||
+                 n.match(/\bm\b/);
+        });
+      }
+      // Fallback: just use first zh voice
+      utter.voice = picked || zhVoices[0];
+    }
+
+    ttsSpeaking = true;
+    utter.onend = function() { ttsSpeaking = false; };
+    utter.onerror = function() { ttsSpeaking = false; };
+    window.speechSynthesis.speak(utter);
+  }
+
+  // Voices may not be loaded yet
+  if(window.speechSynthesis.getVoices().length > 0) {
+    trySpeak();
+  } else {
+    window.speechSynthesis.addEventListener("voiceschanged", function handler() {
+      window.speechSynthesis.removeEventListener("voiceschanged", handler);
+      trySpeak();
+    });
+  }
+}
+
+function stopPoetSpeech() {
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  ttsSpeaking = false;
+}
+
+
+// ── Standalone Poets Page ──
+function initPoetsPage() {
+  var el = document.getElementById("poetsGalleryPage");
+  if(!el) return;
+  el.innerHTML = "";
+  // reuse gallery builder but target this container
+  buildPoetsGallery(el);
+}
+
+// ── Poets Gallery (shared builder) ──
+function initPoetsGallery() {
+  var el = document.getElementById("poetsGallery");
+  if(!el) return;
+  el.innerHTML = "";
+  buildPoetsGallery(el);
+}
+
+function buildPoetsGallery(el) {
+  el.innerHTML = "";
+
+  // Header
+  var hdr = document.createElement("div");
+  hdr.className = "pg-header";
+  hdr.innerHTML = "<div class='pg-header-title'>与诗人对话</div>" +
+    "<span class='pg-header-sub'>拨通千年时光，与古人倾心交谈</span>";
+  el.appendChild(hdr);
+
+  // Cards grid
+  var grid = document.createElement("div");
+  grid.className = "poet-cards";
+
+  POETS_DATA.forEach(function(poet, i) {
+    var card = document.createElement("div");
+    card.className = "poet-card";
+
+    // Image
+    var img = document.createElement("img");
+    img.className = "poet-card-img";
+    img.src = poet.img;
+    img.alt = poet.name;
+    var ph = document.createElement("div");
+    ph.className = "poet-card-img-ph";
+    ph.textContent = poetEmoji(poet.name);
+    ph.style.display = "none";
+    img.addEventListener("error", function() {
+      img.style.display = "none";
+      ph.style.display = "flex";
+    });
+    card.appendChild(img);
+    card.appendChild(ph);
+
+    // Body
+    var body = document.createElement("div");
+    body.className = "poet-card-body";
+    var name = document.createElement("div");
+    name.className = "poet-card-name";
+    name.textContent = poet.name;
+    var meta = document.createElement("div");
+    meta.className = "poet-card-meta";
+    meta.textContent = poet.dynasty + "代 · 诗人";
+    var style = document.createElement("div");
+    style.className = "poet-card-style";
+    style.textContent = poet.style;
+    body.appendChild(name);
+    body.appendChild(meta);
+    body.appendChild(style);
+    card.appendChild(body);
+
+    // Call button
+    var callBtn = document.createElement("button");
+    callBtn.className = "poet-card-call";
+    callBtn.textContent = "📞 通话";
+    callBtn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      startCallFromGallery(i);
+    });
+    card.appendChild(callBtn);
+
+    // Card click also starts call
+    card.addEventListener("click", function() {
+      startCallFromGallery(i);
+    });
+
+    grid.appendChild(card);
+  });
+
+  el.appendChild(grid);
+}
+
+function poetEmoji(name) {
+  var map = {"李白":"🍶","杜甫":"📜","王维":"🎋","李清照":"🪷",
+    "苏轼":"🌊","岳飞":"⚔","白居易":"🕯","陆游":"🗡"};
+  return map[name] || "📜";
+}
+
+// ── Called from modal "与诗人通话" button ──
+function initChat(poem) {
+  callPoem = poem;
+  var btn = document.getElementById("callBtn");
+  if(!btn) return;
+  btn.onclick = function() {
+    var author = poem.author;
+    var poetIdx = POETS_DATA.findIndex(function(p){ return p.name === author; });
+    if(poetIdx < 0) poetIdx = 0;
+    startCallFromGallery(poetIdx, poem);
+  };
+}
+
+function startCallFromGallery(poetIdx, poem) {
+  var poet = POETS_DATA[poetIdx];
+  if(!poet) return;
+  callCurrentPoet = poet;
+  if(!poem) {
+    var found = POEMS.filter(function(p){ return p.author === poet.name; });
+    poem = found.length ? found[0] : POEMS[0];
+  }
+  callPoem = poem;
+  startCall();
+}
+
+function startCall() {
+  if(!callCurrentPoet) return;
+  if(!callPoem) callPoem = POEMS[0];
+  var poet = callCurrentPoet;
+  var poem = callPoem;
+
+  callHistory = [];
+  callBusy    = false;
+  callActive  = false;
+  callSeconds = 0;
+  callMuted   = false;
+
+  // Setup bg
+  var bgEl = document.getElementById("callBg");
+  bgEl.style.backgroundImage = "";
+  bgEl.style.background = poet.bg || "#0d1008";
+  // Try to load portrait as bg too
+  if(poet.img) {
+    var tmp = new Image();
+    tmp.onload = function(){
+      bgEl.style.backgroundImage = "url('" + poet.img + "')";
+      bgEl.style.backgroundSize = "cover";
+      bgEl.style.backgroundPosition = "top center";
+    };
+    tmp.src = poet.img;
+  }
+
+  // Portrait
+  var inner = document.getElementById("callPortraitInner");
+  inner.innerHTML = "";
+  if(poet.img) {
+    var img = document.createElement("img");
+    img.src = poet.img;
+    img.alt = poet.name;
+    img.style.cssText = "width:100%;height:100%;object-fit:cover;object-position:top;";
+    img.onerror = function(){ inner.textContent = poetEmoji(poet.name); inner.className = "call-portrait-ph"; };
+    inner.className = "";
+    inner.appendChild(img);
+  } else {
+    inner.textContent = poetEmoji(poet.name);
+    inner.className = "call-portrait-ph";
+  }
+
+  // Text fields
+  document.getElementById("callPoetDyn").textContent  = poet.dynasty + "代诗人";
+  document.getElementById("callPoetName").textContent  = poet.name;
+  document.getElementById("callPoetSub").textContent   = "正在拨号中…";
+  document.getElementById("callStateTxt").textContent  = "";
+  document.getElementById("callTimer").style.display   = "none";
+  document.getElementById("callConvo").innerHTML       = "";
+  document.getElementById("callConvo").classList.remove("on");
+  document.getElementById("callChips").classList.remove("on");
+  document.getElementById("callInputBar").classList.remove("on");
+  document.getElementById("callMute").classList.remove("on");
+  document.getElementById("callSpk").classList.remove("on");
+
+  // Show overlay
+  var ov=document.getElementById("callOverlay");
+  if(ov) ov.classList.add("on");
+  document.body.style.overflow = "hidden";
+
+  // Ringing
+  playGuqin("ring");
+  var ringCount = 0;
+  var ringInterval = setInterval(function(){
+    ringCount++;
+    document.getElementById("callStateTxt").textContent =
+      ringCount % 2 === 0 ? "嘟… 嘟…" : "";
+    if(ringCount >= 6) {
+      clearInterval(ringInterval);
+      connectCall();
+    }
+  }, 400);
+
+  // Wire buttons
+  wireCallBtn("callEnd",   hangUp);
+  wireCallBtn("callMute",  function(){
+    callMuted = !callMuted;
+    document.getElementById("callMute").classList.toggle("on", callMuted);
+    document.getElementById("callMute").textContent = callMuted ? "🔇" : "🎤";
+  });
+  wireCallBtn("callSpk", function(){
+    document.getElementById("callSpk").classList.toggle("on");
+  });
+  wireCallBtn("callInputSend", sendCallMsg);
+
+  var newInput = document.getElementById("callInput");
+  if(newInput) {
+    newInput.onkeydown = function(e){
+      if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendCallMsg();}
+    };
+    newInput.oninput = function(){
+      this.style.height="auto";
+      this.style.height=Math.min(this.scrollHeight,70)+"px";
+    };
+  }
+}
+
+function wireCallBtn(id, fn) {
+  var btn = document.getElementById(id);
+  if(btn) btn.onclick = fn;
+}
+
+function connectCall() {
+  playGuqin("connect");
+  setTimeout(function(){ playGuqin('bgStart'); }, 800);
+  callActive = true;
+  document.getElementById("callPoetSub").textContent  = "通话中";
+  document.getElementById("callStateTxt").textContent = "";
+  document.getElementById("callTimer").style.display  = "inline";
+  document.getElementById("callConvo").classList.add("on");
+  document.getElementById("callChips").classList.add("on");
+  document.getElementById("callInputBar").classList.add("on");
+
+  // Chips
+  var chipsEl = document.getElementById("callChips");
+  chipsEl.innerHTML = "";
+  CALL_QUESTIONS.forEach(function(q){
+    var btn = document.createElement("button");
+    btn.className = "call-chip"; btn.textContent = q;
+    btn.addEventListener("click", function(){
+      document.getElementById("callInput").value = q;
+      sendCallMsg();
+    });
+    chipsEl.appendChild(btn);
+  });
+
+  // Timer
+  callSeconds = 0;
+  callTimerInterval = setInterval(function(){
+    callSeconds++;
+    var m = Math.floor(callSeconds/60), s = callSeconds%60;
+    document.getElementById("callTimer").textContent =
+      (m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+  }, 1000);
+
+  // Opening
+  var poem = callPoem, poet = callCurrentPoet;
+  var greeting = poem
+    ? poet.name+"在此。《"+poem.title+"》乃吾心血之作，汝有何想问，但说无妨。"
+    : poet.name+"在此，有何想问？";
+  appendCallMsg("poet", greeting);
+  if(callCurrentPoet) speakPoetReply(greeting, callCurrentPoet.gender || "male");
+  callHistory.push({role:"assistant", content:greeting});
+}
+
+function hangUp() {
+  playGuqin('bgStop');
+  playGuqin("hangup");
+  clearInterval(callTimerInterval);
+  callActive = false; callBusy = false;
+  document.getElementById("callOverlay").classList.remove("on");
+  document.body.style.overflow = "";
+}
+
+function appendCallMsg(role, text) {
+  var convo = document.getElementById("callConvo");
+  var div = document.createElement("div");
+  div.className = "call-msg" + (role==="user"?" user":"");
+  var nameDiv = document.createElement("div");
+  nameDiv.className = "call-bubble-name";
+  nameDiv.textContent = role==="user" ? "你" : (callCurrentPoet ? callCurrentPoet.name : "诗人");
+  var bubble = document.createElement("div");
+  bubble.className = "call-bubble "+(role==="user"?"user":"poet");
+  bubble.textContent = text;
+  div.appendChild(nameDiv); div.appendChild(bubble);
+  convo.appendChild(div);
+  convo.scrollTop = convo.scrollHeight;
+}
+
+function appendTypingCall() {
+  var convo = document.getElementById("callConvo");
+  var div = document.createElement("div");
+  div.className = "call-msg"; div.id = "callTyping";
+  var nd = document.createElement("div");
+  nd.className = "call-bubble-name";
+  nd.textContent = callCurrentPoet ? callCurrentPoet.name : "诗人";
+  var bubble = document.createElement("div");
+  bubble.className = "call-bubble poet typing";
+  bubble.textContent = " ";
+  div.appendChild(nd); div.appendChild(bubble);
+  convo.appendChild(div);
+  convo.scrollTop = convo.scrollHeight;
+}
+
+function removeTypingCall() {
+  var el = document.getElementById("callTyping");
+  if(el) el.remove();
+}
+
+async function sendCallMsg() {
+  if(callBusy||!callActive||!callCurrentPoet) return;
+  var inputEl = document.getElementById("callInput");
+  var text = inputEl.value.trim();
+  if(!text) return;
+  inputEl.value = ""; inputEl.style.height = "auto";
+  callBusy = true;
+  document.getElementById("callInputSend").disabled = true;
+
+  appendCallMsg("user", text);
+  callHistory.push({role:"user", content:text});
+  playGuqin('send');
+  appendTypingCall();
+
+  var poet = callCurrentPoet, poem = callPoem;
+  var poemText = poem ? poem.lines.map(function(l){return l.text;}).join("") : "";
+  var sys = poet.prompt +
+    (poem ? "\n\n你刚创作了《"+poem.title+"》，全文：\n"+poemText+"\n背景："+poem.notes : "") +
+    "\n\n你正在和一位现代小读者通电话。" +
+    "请用第一人称以"+poet.name+"的口吻回答，语言亲切易懂但有古风韵味。" +
+    "每次回答70字以内，像真实通话一样自然简短。不要暴露自己是AI。";
+
+  try {
+    var resp = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:250,
+        system:sys,messages:callHistory})
+    });
+    var data = await resp.json();
+    var reply = (data.content&&data.content[0]&&data.content[0].text)||"（沉默）……";
+    removeTypingCall();
+    playGuqin('receive');
+    appendCallMsg("poet", reply);
+    if(callCurrentPoet) speakPoetReply(reply, callCurrentPoet.gender || "male");
+    callHistory.push({role:"assistant",content:reply});
+    if(callHistory.length>16) callHistory=callHistory.slice(-16);
+  } catch(err) {
+    removeTypingCall();
+    appendCallMsg("poet","（信号不佳，请再说一遍）");
+  }
+  callBusy = false;
+  document.getElementById("callInputSend").disabled = false;
+}
+
+
+// ════ INIT ════
+initHome();
+initAI();
+</script>
+
+
+<!-- CALL OVERLAY -->
+<div class="call-overlay" id="callOverlay">
+  <div class="call-bg" id="callBg"></div>
+  <div class="call-bg-overlay"></div>
+  <div class="call-content">
+    <div class="call-status-bar">
+      <span id="callPoetDyn">诗人</span>
+      <span class="call-timer" id="callTimer" style="display:none">00:00</span>
+    </div>
+    <div class="call-portrait" id="callPortraitWrap">
+      <div class="call-ring r1"></div>
+      <div class="call-ring r2"></div>
+      <div class="call-ring r3"></div>
+      <div id="callPortraitInner" class="call-portrait-ph">📜</div>
+    </div>
+    <div class="call-poet-name" id="callPoetName">诗人</div>
+    <div class="call-poet-dyn" id="callPoetSub">正在接通…</div>
+    <div class="call-state" id="callStateTxt"></div>
+    <div class="call-chips" id="callChips"></div>
+    <div class="call-convo" id="callConvo"></div>
+    <div class="call-input-bar" id="callInputBar">
+      <textarea class="call-input" id="callInput" placeholder="向诗人提问…" rows="1"></textarea>
+      <button class="call-input-send" id="callInputSend">发送</button>
+    </div>
+    <div class="call-controls">
+      <button class="call-ctrl mute" id="callMute">🎤</button>
+      <button class="call-ctrl end" id="callEnd">📵</button>
+      <button class="call-ctrl spk" id="callSpk">🔊</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
